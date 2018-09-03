@@ -6,15 +6,6 @@
  * Time: 11:59
  */
 
-$input = range(1, 160);
-$rand_keys = array_rand($input, 32);
-
-$i = 1;
-
-foreach ($rand_keys as $rand_key) {
-    print($i . ' - ' . $input[$rand_key] . '<br>');
-    $i++;
-}
 
 ?>
 
@@ -41,65 +32,127 @@ foreach ($rand_keys as $rand_key) {
 
 <div class="container">
     <div class="py-5 text-center">
-        <img class="d-block mx-auto mb-4" src="./logo.png" alt="logo" >
+        <img class="d-block mx-auto mb-4" src="./logo.png" alt="logo">
         <h2>Sorteo de Bancas</h2>
-        <p class="lead">Below is an example form built entirely with Bootstrap's form controls. Each required form group
-            has a validation state that can be triggered by attempting to submit the form without completing it.</p>
+        <p class="lead">Para el Parlamento de la Mujer</p>
     </div>
 
     <div class="row">
-        <div class="col-md-4 mb-4">
-            <h4 class="d-flex justify-content-between align-items-center mb-3">
-                <span class="text-muted">Your cart</span>
-            </h4>
-            <ul class="list-group mb-3">
-                <li class="list-group-item d-flex justify-content-between lh-condensed">
-                    <div>
-                        <h6 class="my-0">Product name</h6>
-                        <small class="text-muted">Brief description</small>
+        <div class="col-md-12">
+            <form method="post" name="sorteo">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="total">Total</label>
+                            <input required type="number" name="total" class="form-control" id="total"
+                                   aria-describedby="total"
+                                   value="<?php ( isset( $_POST['total'] ) ) ? print $_POST['total'] : '' ?>">
+                        </div>
                     </div>
-                    <span class="text-muted">$12</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between lh-condensed">
-                    <div>
-                        <h6 class="my-0">Second product</h6>
-                        <small class="text-muted">Brief description</small>
-                    </div>
-                    <span class="text-muted">$8</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between lh-condensed">
-                    <div>
-                        <h6 class="my-0">Third item</h6>
-                        <small class="text-muted">Brief description</small>
-                    </div>
-                    <span class="text-muted">$5</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between bg-light">
-                    <div class="text-success">
-                        <h6 class="my-0">Promo code</h6>
-                        <small>EXAMPLECODE</small>
-                    </div>
-                    <span class="text-success">-$5</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between">
-                    <span>Total (USD)</span>
-                    <strong>$20</strong>
-                </li>
-            </ul>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="titulares">Titulares</label>
+                            <input required type="number" name="titulares" class="form-control" id="titulares"
+                                   value="<?php ( isset( $_POST['titulares'] ) ) ? print $_POST['titulares'] : '' ?>">
 
+                        </div>
+                        <div class="form-group">
+                            <label for="suplentes">Suplentes</label>
+                            <input required type="number" name="suplentes" class="form-control" id="suplentes"
+                                   value="<?php ( isset( $_POST['suplentes'] ) ) ? print $_POST['suplentes'] : '' ?>">
+
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-lg btn-block" type="submit">Realizar Sorteo</button>
+            </form>
         </div>
+    </div>
 
-        <button class="btn btn-primary btn-lg btn-block" type="submit">Realizar Sorteo</button>
+    <div class="row mt-1">
+		<?php
+		if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
+			$total     = $_POST['total'];
+			$titulares = $_POST['titulares'];
+			$suplentes = $_POST['suplentes'];
+
+			$input = range( 1, $total );
+
+			if ( ( $titulares + $suplentes ) <= $total ) {
+				$rand_keys = array_rand( $input, $titulares + $suplentes );
+				$i         = 1;
+
+
+				print( '<div class="col-md-6 mb-6">' );
+				print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
+				print( '<span class="text-muted">Titulares</span>' );
+				print( '</h4>' );
+				print( '<ul class="list-group mb-3">' );
+				print('
+				<li class="list-group-item d-flex justify-content-between">
+                    <span>Posición</span>
+                    <strong>Nº Orden</strong>
+                </li>
+				');
+
+				foreach ( $rand_keys as $key => $rand_key ) {
+					if ($i > $titulares){
+						break;
+					}
+
+					print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
+					print( '<div><h6 class="my-0">#' . $i . '</h6></div>' );
+					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
+					print( '</li>' );
+
+					unset( $rand_keys[ $key ] );
+
+					$i ++;
+
+				}
+
+
+				print( '</ul>' );
+				print( '</div>' );
+
+//				suplentes
+
+				print( '<div class="col-md-6 mb-6">' );
+				print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
+				print( '<span class="text-muted">Suplentes</span>' );
+				print( '</h4>' );
+				print( '<ul class="list-group mb-3">' );
+				print('
+				<li class="list-group-item d-flex justify-content-between">
+                    <span>Posición</span>
+                    <strong>Nº Orden</strong>
+                </li>
+				');
+
+				foreach ( $rand_keys as $key => $rand_key ) {
+
+					print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
+					print( '<div><h6 class="my-0">#' . $i . '</h6></div>' );
+					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
+					print( '</li>' );
+
+					$i ++;
+				}
+
+
+				print( '</ul>' );
+				print( '</div>' );
+
+			}
+
+		}
+		?>
 
     </div>
 
     <footer class="my-5 pt-5 text-muted text-center text-small">
         <p class="mb-1">&copy; 2018 HCD Posadas</p>
-<!--        <ul class="list-inline">-->
-<!--            <li class="list-inline-item"><a href="#">Privacy</a></li>-->
-<!--            <li class="list-inline-item"><a href="#">Terms</a></li>-->
-<!--            <li class="list-inline-item"><a href="#">Support</a></li>-->
-<!--        </ul>-->
     </footer>
 </div>
 
