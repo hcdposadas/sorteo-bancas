@@ -2,5 +2,10 @@ $theme-colors: (
         "primary": #008a77
 );
 
+$custom-file-text: (
+        en: "Browse",
+        es: "Elegir"
+);
+
 @import "~bootstrap/scss/bootstrap";
 @import "~font-awesome/css/font-awesome.min.css";
