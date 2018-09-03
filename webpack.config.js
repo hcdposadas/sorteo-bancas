@@ -7,7 +7,7 @@ module.exports = function(env) {
         output: {
             path: path.resolve(__dirname, "dist"),
             filename: "bundle.js",
-            publicPath: 'http://localhost/sorteo-bancas/dist/'
+            publicPath: 'dist/'
         },
         module: {
             loaders: [
