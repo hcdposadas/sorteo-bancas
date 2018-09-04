@@ -101,6 +101,7 @@
 
 			$total     = $_POST['total'];
 			$sheetData = null;
+			$etiquetaColumna2 = 'Nº Orden';
 
 			$file_mimes = array(
 				'text/x-comma-separated-values',
@@ -133,6 +134,7 @@
 				$sheetData = $spreadsheet->getActiveSheet()->toArray();
 
 				$total = count( $sheetData );
+				$etiquetaColumna2 = 'Nombre, Apellido y DNI';
 //				print_r( $sheetData );
 			}
 
@@ -155,7 +157,7 @@
 				print( '
 				<li class="list-group-item d-flex justify-content-between">
                     <span>Posición</span>
-                    <strong>Nº Orden</strong>
+                    <strong>'.$etiquetaColumna2.'</strong>
                 </li>
 				' );
 
@@ -195,7 +197,7 @@
 				print( '
 				<li class="list-group-item d-flex justify-content-between">
                     <span>Posición</span>
-                    <strong>Nº Orden</strong>
+                    <strong>'.$etiquetaColumna2.'</strong>
                 </li>
 				' );
 
