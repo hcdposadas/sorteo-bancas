@@ -59,7 +59,7 @@
                             <label for="total">Total</label>
                             <input required type="number" name="total" class="form-control" id="total"
                                    aria-describedby="total"
-                                   value="<?php ( isset( $_POST['total'] ) ) ? print $_POST['total'] : '' ?>">
+                                   value="<?php ( isset( $_POST['total'] ) ) ? print $_POST['total'] : print '0' ?>">
                             <small id="totalHelpBlock" class="form-text text-muted">
                                 Si se sube la planilla este valor será ignorado.
                             </small>
@@ -69,13 +69,13 @@
                         <div class="form-group">
                             <label for="titulares">Titulares</label>
                             <input required type="number" name="titulares" class="form-control" id="titulares"
-                                   value="<?php ( isset( $_POST['titulares'] ) ) ? print $_POST['titulares'] : '' ?>">
+                                   value="<?php ( isset( $_POST['titulares'] ) ) ? print $_POST['titulares'] : print '14' ?>">
 
                         </div>
                         <div class="form-group">
                             <label for="suplentes">Suplentes</label>
                             <input required type="number" name="suplentes" class="form-control" id="suplentes"
-                                   value="<?php ( isset( $_POST['suplentes'] ) ) ? print $_POST['suplentes'] : '' ?>">
+                                   value="<?php ( isset( $_POST['suplentes'] ) ) ? print $_POST['suplentes'] : print '14' ?>">
 
                         </div>
                     </div>
@@ -86,143 +86,457 @@
         </div>
     </div>
 
+
+	<?php
+
+	require 'vendor/autoload.php';
+
+	use PhpOffice\PhpSpreadsheet\Spreadsheet;
+	use PhpOffice\PhpSpreadsheet\Reader\Csv;
+	use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
+
+
+	if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
+	$concejales = [
+		1  => 'Alcaráz, Mario',
+		2  => 'Acuña, Miguel',
+		3  => 'Arjol, Martin',
+		4  => 'Barrios, Diego',
+		5  => 'Fonseca, Francisco',
+		6  => 'Florindo, Maximiliano',
+		7  => 'Giménez, Natalia',
+		8  => 'Meza, Fernando',
+		9  => 'Mutinelli, Andrés',
+		10 => 'Olmedo, Omar',
+		11 => 'Repetto, Anahí',
+		12 => 'Rossberg, Juan',
+		13 => 'Sánchez, Manuel',
+		14 => 'Velázquez, Pablo',
+	]
+	?>
+
+    <div class="row mt-1">
+        <div class="col-md-6 mb-6">
+            <h4 class="d-flex justify-content-between align-items-center mb-3">
+                <span class="text-muted">Referencia</span>
+            </h4>
+            <ul class="list-group mb-3">
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>Banca</span>
+                    <strong>Concejal</strong>
+                </li>
+				<?php
+				foreach ( $concejales as $n => $concejal ) {
+
+				    if ($n > 7){
+				        break;
+                    }
+
+					print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
+					print( '<div><h6 class="my-0">#' . $n . '</h6></div>' );
+					print( '<span class="text-muted">' . $concejal . '</span>' );
+
+					print( '</li>' );
+
+					unset( $concejales[ $n ] );
+				}
+				?>
+            </ul>
+        </div>
+        <div class="col-md-6 mb-6">
+            <h4 class="d-flex justify-content-between align-items-center mb-3">
+                <span class="text-muted">Referencia</span>
+            </h4>
+            <ul class="list-group mb-3">
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>Banca</span>
+                    <strong>Concejal</strong>
+                </li>
+			    <?php
+			    foreach ( $concejales as $n => $concejal ) {
+
+				    print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
+				    print( '<div><h6 class="my-0">#' . $n . '</h6></div>' );
+				    print( '<span class="text-muted">' . $concejal . '</span>' );
+
+				    print( '</li>' );
+			    }
+			    ?>
+            </ul>
+        </div>
+    </div>
+
     <div class="row mt-1">
 		<?php
 
-		require 'vendor/autoload.php';
 
-		use PhpOffice\PhpSpreadsheet\Spreadsheet;
-		use PhpOffice\PhpSpreadsheet\Reader\Csv;
-		use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
+		$total            = $_POST['total'];
+		$sheetData        = null;
+		$etiquetaColumna2 = 'Nº Orden';
 
+		$file_mimes = array(
+			'text/x-comma-separated-values',
+			'text/comma-separated-values',
+			'application/octet-stream',
+			'application/vnd.ms-excel',
+			'application/x-csv',
+			'text/x-csv',
+			'text/csv',
+			'application/csv',
+			'application/excel',
+			'application/vnd.msexcel',
+			'text/plain',
+			'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+		);
 
-		if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
+		if ( isset( $_FILES['archivo']['name'] ) && in_array( $_FILES['archivo']['type'], $file_mimes ) ) {
 
+			$arr_file  = explode( '.', $_FILES['archivo']['name'] );
+			$extension = end( $arr_file );
 
-			$total     = $_POST['total'];
-			$sheetData = null;
-			$etiquetaColumna2 = 'Nº Orden';
-
-			$file_mimes = array(
-				'text/x-comma-separated-values',
-				'text/comma-separated-values',
-				'application/octet-stream',
-				'application/vnd.ms-excel',
-				'application/x-csv',
-				'text/x-csv',
-				'text/csv',
-				'application/csv',
-				'application/excel',
-				'application/vnd.msexcel',
-				'text/plain',
-				'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-			);
-
-			if ( isset( $_FILES['archivo']['name'] ) && in_array( $_FILES['archivo']['type'], $file_mimes ) ) {
-
-				$arr_file  = explode( '.', $_FILES['archivo']['name'] );
-				$extension = end( $arr_file );
-
-				if ( 'csv' == $extension ) {
-					$reader = new \PhpOffice\PhpSpreadsheet\Reader\Csv();
-				} else {
-					$reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
-				}
-
-				$spreadsheet = $reader->load( $_FILES['archivo']['tmp_name'] );
-
-				$sheetData = $spreadsheet->getActiveSheet()->toArray();
-
-				$total = count( $sheetData );
-				$etiquetaColumna2 = 'Nombre, Apellido y DNI';
-//				print_r( $sheetData );
+			if ( 'csv' == $extension ) {
+				$reader = new \PhpOffice\PhpSpreadsheet\Reader\Csv();
+			} else {
+				$reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
 			}
 
+			$spreadsheet = $reader->load( $_FILES['archivo']['tmp_name'] );
 
-			$titulares = $_POST['titulares'];
-			$suplentes = $_POST['suplentes'];
+			$sheetData = $spreadsheet->getActiveSheet()->toArray();
 
-			$input = range( 1, $total );
-
-			if ( ( $titulares + $suplentes ) <= $total ) {
-				$rand_keys = array_rand( $input, $titulares + $suplentes );
-				$i         = 1;
+			$total            = count( $sheetData );
+			$etiquetaColumna2 = 'Nombre, Apellido y DNI';
+//				print_r( $sheetData );
+		}
 
 
-				print( '<div class="col-md-6 mb-6">' );
-				print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
-				print( '<span class="text-muted">Titulares</span>' );
-				print( '</h4>' );
-				print( '<ul class="list-group mb-3">' );
-				print( '
+		$titulares = $_POST['titulares'];
+		$suplentes = $_POST['suplentes'];
+
+		$input = range( 1, $total );
+
+		if ( ( $titulares + $suplentes ) <= $total ) {
+
+			// 2 defensoras del pueblo (titular y suplente)
+			// 2 secretarias (titular y suplente)
+			// 2 prosecretarias legislativas (titular y suplente)
+			// 2 prosecretarias administrativas (titular y suplente)
+			$cantidadExtra = 8;
+
+			$rand_keys = array_rand( $input, $titulares + $suplentes + $cantidadExtra );
+			$i         = 1;
+
+
+			print( '<div class="col-md-6 mb-6">' );
+			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
+			print( '<span class="text-muted">Titulares</span>' );
+			print( '</h4>' );
+			print( '<ul class="list-group mb-3">' );
+			print( '
 				<li class="list-group-item d-flex justify-content-between">
                     <span>Posición</span>
-                    <strong>'.$etiquetaColumna2.'</strong>
+                    <strong>' . $etiquetaColumna2 . '</strong>
                 </li>
 				' );
 
-				foreach ( $rand_keys as $key => $rand_key ) {
-					if ( $i > $titulares ) {
-						break;
-					}
-					print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-					print( '<div><h6 class="my-0">#' . $i . '</h6></div>' );
-					if ( $sheetData ) {
+			foreach ( $rand_keys as $key => $rand_key ) {
+				if ( $i > $titulares ) {
+					break;
+				}
+				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
+				print( '<div><h6 class="my-0">#' . $i . '</h6></div>' );
+				if ( $sheetData ) {
 
-						print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
-					} else {
+					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
+				} else {
 
-						print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
-					}
-
-					print( '</li>' );
-
-					unset( $rand_keys[ $key ] );
-
-					$i ++;
-
+					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
 				}
 
+				print( '</li>' );
 
-				print( '</ul>' );
-				print( '</div>' );
+				unset( $rand_keys[ $key ] );
+
+				$i ++;
+
+			}
+
+
+			print( '</ul>' );
+			print( '</div>' );
 
 //				suplentes
 
-				print( '<div class="col-md-6 mb-6">' );
-				print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
-				print( '<span class="text-muted">Suplentes</span>' );
-				print( '</h4>' );
-				print( '<ul class="list-group mb-3">' );
-				print( '
+			print( '<div class="col-md-6 mb-6">' );
+			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
+			print( '<span class="text-muted">Suplentes</span>' );
+			print( '</h4>' );
+			print( '<ul class="list-group mb-3">' );
+			print( '
 				<li class="list-group-item d-flex justify-content-between">
                     <span>Posición</span>
-                    <strong>'.$etiquetaColumna2.'</strong>
+                    <strong>' . $etiquetaColumna2 . '</strong>
                 </li>
 				' );
 
-				foreach ( $rand_keys as $key => $rand_key ) {
+			foreach ( $rand_keys as $key => $rand_key ) {
 
-					print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-					print( '<div><h6 class="my-0">#' . $i . '</h6></div>' );
-					if ( $sheetData ) {
-
-						print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
-					} else {
-
-						print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
-					}
-
-					print( '</li>' );
-
-					$i ++;
+				if ( $i > ( $suplentes + $titulares ) ) {
+					break;
 				}
 
+				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
+				print( '<div><h6 class="my-0">#' . $i . '</h6></div>' );
+				if ( $sheetData ) {
 
-				print( '</ul>' );
-				print( '</div>' );
+					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
+				} else {
 
+					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
+				}
+
+				print( '</li>' );
+
+				unset( $rand_keys[ $key ] );
+
+				$i ++;
 			}
+
+
+			print( '</ul>' );
+			print( '</div>' );
+
+			// Secretarias
+
+			print( '<div class="col-md-6 mb-6">' );
+			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
+			print( '<span class="text-muted">Secretaria</span>' );
+			print( '</h4>' );
+			print( '<ul class="list-group mb-3">' );
+			print( '
+				<li class="list-group-item d-flex justify-content-between">
+                    <span>Posición</span>
+                    <strong>' . $etiquetaColumna2 . '</strong>
+                </li>
+				' );
+
+			foreach ( $rand_keys as $key => $rand_key ) {
+
+				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
+				print( '<div><h6 class="my-0">#' . $i . '</h6></div>' );
+				if ( $sheetData ) {
+
+					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
+				} else {
+
+					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
+				}
+
+				print( '</li>' );
+
+				unset( $rand_keys[ $key ] );
+
+				$i ++;
+
+				break;
+			}
+
+
+			print( '</ul>' );
+			print( '</div>' );
+
+			print( '<div class="col-md-6 mb-6">' );
+			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
+			print( '<span class="text-muted">Secretaria Suplente</span>' );
+			print( '</h4>' );
+			print( '<ul class="list-group mb-3">' );
+			print( '
+				<li class="list-group-item d-flex justify-content-between">
+                    <span>Posición</span>
+                    <strong>' . $etiquetaColumna2 . '</strong>
+                </li>
+				' );
+
+			foreach ( $rand_keys as $key => $rand_key ) {
+
+				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
+				print( '<div><h6 class="my-0">#' . $i . '</h6></div>' );
+				if ( $sheetData ) {
+
+					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
+				} else {
+
+					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
+				}
+
+				print( '</li>' );
+
+				unset( $rand_keys[ $key ] );
+
+				$i ++;
+
+				break;
+			}
+
+
+			print( '</ul>' );
+			print( '</div>' );
+
+			// Defensoras del pueblo
+
+			print( '<div class="col-md-6 mb-6">' );
+			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
+			print( '<span class="text-muted">Defensora del Pueblo</span>' );
+			print( '</h4>' );
+			print( '<ul class="list-group mb-3">' );
+			print( '
+				<li class="list-group-item d-flex justify-content-between">
+                    <span>Posición</span>
+                    <strong>' . $etiquetaColumna2 . '</strong>
+                </li>
+				' );
+
+			foreach ( $rand_keys as $key => $rand_key ) {
+
+				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
+				print( '<div><h6 class="my-0">#' . $i . '</h6></div>' );
+				if ( $sheetData ) {
+
+					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
+				} else {
+
+					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
+				}
+
+				print( '</li>' );
+
+				unset( $rand_keys[ $key ] );
+
+				$i ++;
+
+				break;
+			}
+
+
+			print( '</ul>' );
+			print( '</div>' );
+
+			print( '<div class="col-md-6 mb-6">' );
+			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
+			print( '<span class="text-muted">Defensora del Pueblo Suplente</span>' );
+			print( '</h4>' );
+			print( '<ul class="list-group mb-3">' );
+			print( '
+				<li class="list-group-item d-flex justify-content-between">
+                    <span>Posición</span>
+                    <strong>' . $etiquetaColumna2 . '</strong>
+                </li>
+				' );
+
+			foreach ( $rand_keys as $key => $rand_key ) {
+
+				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
+				print( '<div><h6 class="my-0">#' . $i . '</h6></div>' );
+				if ( $sheetData ) {
+
+					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
+				} else {
+
+					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
+				}
+
+				print( '</li>' );
+
+				unset( $rand_keys[ $key ] );
+
+				$i ++;
+
+				break;
+			}
+
+
+			print( '</ul>' );
+			print( '</div>' );
+
+			// Prosecretarias
+
+			print( '<div class="col-md-6 mb-6">' );
+			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
+			print( '<span class="text-muted">Pro Secretaria Legislativa</span>' );
+			print( '</h4>' );
+			print( '<ul class="list-group mb-3">' );
+			print( '
+				<li class="list-group-item d-flex justify-content-between">
+                    <span>Posición</span>
+                    <strong>' . $etiquetaColumna2 . '</strong>
+                </li>
+				' );
+
+			foreach ( $rand_keys as $key => $rand_key ) {
+
+				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
+				print( '<div><h6 class="my-0">#' . $i . '</h6></div>' );
+				if ( $sheetData ) {
+
+					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
+				} else {
+
+					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
+				}
+
+				print( '</li>' );
+
+				unset( $rand_keys[ $key ] );
+
+				$i ++;
+
+				break;
+			}
+
+
+			print( '</ul>' );
+			print( '</div>' );
+
+			print( '<div class="col-md-6 mb-6">' );
+			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
+			print( '<span class="text-muted">Pro Secretaria Administrativa</span>' );
+			print( '</h4>' );
+			print( '<ul class="list-group mb-3">' );
+			print( '
+				<li class="list-group-item d-flex justify-content-between">
+                    <span>Posición</span>
+                    <strong>' . $etiquetaColumna2 . '</strong>
+                </li>
+				' );
+
+			foreach ( $rand_keys as $key => $rand_key ) {
+
+				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
+				print( '<div><h6 class="my-0">#' . $i . '</h6></div>' );
+				if ( $sheetData ) {
+
+					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
+				} else {
+
+					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
+				}
+
+				print( '</li>' );
+
+				unset( $rand_keys[ $key ] );
+
+				$i ++;
+
+				break;
+			}
+
+
+			print( '</ul>' );
+			print( '</div>' );
+
+
+		}
+		//			if principal
 
 		}
 		?>
@@ -230,7 +544,7 @@
     </div>
 
     <footer class="my-5 pt-5 text-muted text-center text-small">
-        <p class="mb-1">&copy; 2018 HCD Posadas</p>
+        <p class="mb-1">&copy; 2019 HCD Posadas</p>
     </footer>
 </div>
 
