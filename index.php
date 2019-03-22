@@ -204,6 +204,10 @@
 
 			$sheetData = $spreadsheet->getActiveSheet()->toArray();
 
+			unset($sheetData[0]);
+
+			shuffle($sheetData);
+
 			$total            = count( $sheetData );
 			$etiquetaColumna2 = 'Nombre, Apellido y DNI';
 //				print_r( $sheetData );
