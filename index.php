@@ -99,18 +99,18 @@
 	if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
 	$concejales = [
 		1  => 'Alcaráz, Mario',
-		2  => 'Acuña, Miguel',
-		3  => 'Arjol, Martin',
-		4  => 'Barrios, Diego',
-		5  => 'Fonseca, Francisco',
+		2  => 'Arjol, Martin',
+		3  => 'Barrios, Diego',
+		4  => 'Dachary, Mariela',
+		5  => 'De Arrechea, Rodrigo',
 		6  => 'Florindo, Maximiliano',
-		7  => 'Giménez, Natalia',
-		8  => 'Meza, Fernando',
-		9  => 'Mutinelli, Andrés',
-		10 => 'Olmedo, Omar',
-		11 => 'Repetto, Anahí',
-		12 => 'Rossberg, Juan',
-		13 => 'Sánchez, Manuel',
+		7  => 'Fonseca, Francisco',
+		8  => 'Haysler, Marlene',
+		9  => 'Lopez Sartori, Facundo',
+		10 => 'Martinez, Ramon',
+		11 => 'Meza, Fernando',
+		12 => 'Olmedo, Omar',
+		13 => 'Repetto, Anahí',
 		14 => 'Velázquez, Pablo',
 	]
 	?>
@@ -128,9 +128,9 @@
 				<?php
 				foreach ( $concejales as $n => $concejal ) {
 
-				    if ($n > 7){
-				        break;
-                    }
+					if ( $n > 7 ) {
+						break;
+					}
 
 					print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
 					print( '<div><h6 class="my-0">#' . $n . '</h6></div>' );
@@ -152,16 +152,16 @@
                     <span>Banca</span>
                     <strong>Concejal</strong>
                 </li>
-			    <?php
-			    foreach ( $concejales as $n => $concejal ) {
+				<?php
+				foreach ( $concejales as $n => $concejal ) {
 
-				    print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-				    print( '<div><h6 class="my-0">#' . $n . '</h6></div>' );
-				    print( '<span class="text-muted">' . $concejal . '</span>' );
+					print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
+					print( '<div><h6 class="my-0">#' . $n . '</h6></div>' );
+					print( '<span class="text-muted">' . $concejal . '</span>' );
 
-				    print( '</li>' );
-			    }
-			    ?>
+					print( '</li>' );
+				}
+				?>
             </ul>
         </div>
     </div>
@@ -204,9 +204,9 @@
 
 			$sheetData = $spreadsheet->getActiveSheet()->toArray();
 
-			unset($sheetData[0]);
+			unset( $sheetData[0] );
 
-			shuffle($sheetData);
+			shuffle( $sheetData );
 
 			$total            = count( $sheetData );
 			$etiquetaColumna2 = 'Nombre, Apellido y DNI';
@@ -548,7 +548,7 @@
     </div>
 
     <footer class="my-5 pt-5 text-muted text-center text-small">
-        <p class="mb-1">&copy; 2019 HCD Posadas</p>
+        <p class="mb-1">&copy; 2020 HCD Posadas</p>
     </footer>
 </div>
 
