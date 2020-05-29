@@ -25,6 +25,16 @@
 
     <script src="./dist/bundle.js"></script>
 
+    <style>
+        /*borrar despues de usar el ledsote*/
+        body{
+            font-size: 1.2rem;
+            font-weight: 900;
+        }
+        .text-muted{
+            color: #000 !important;
+        }
+    </style>
 
 </head>
 
@@ -133,7 +143,7 @@
 					}
 
 					print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-					print( '<div><h6 class="my-0">#' . $n . '</h6></div>' );
+					print( '<div><h3 class="my-0">#' . $n . '</h3></div>' );
 					print( '<span class="text-muted">' . $concejal . '</span>' );
 
 					print( '</li>' );
@@ -156,7 +166,7 @@
 				foreach ( $concejales as $n => $concejal ) {
 
 					print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-					print( '<div><h6 class="my-0">#' . $n . '</h6></div>' );
+					print( '<div><h3 class="my-0">#' . $n . '</h3></div>' );
 					print( '<span class="text-muted">' . $concejal . '</span>' );
 
 					print( '</li>' );
@@ -248,7 +258,7 @@
 					break;
 				}
 				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-				print( '<div><h6 class="my-0">#' . $i . '</h6></div>' );
+				print( '<div><h3 class="my-0">#' . $i . '</h3></div>' );
 				if ( $sheetData ) {
 
 					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
@@ -290,7 +300,7 @@
 				}
 
 				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-				print( '<div><h6 class="my-0">#' . $i . '</h6></div>' );
+				print( '<div><h3 class="my-0">#' . $i . '</h3></div>' );
 				if ( $sheetData ) {
 
 					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
@@ -327,7 +337,7 @@
 			foreach ( $rand_keys as $key => $rand_key ) {
 
 				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-				print( '<div><h6 class="my-0">#' . $i . '</h6></div>' );
+				print( '<div><h3 class="my-0">#' . $i . '</h3></div>' );
 				if ( $sheetData ) {
 
 					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
@@ -366,7 +376,7 @@
 			foreach ( $rand_keys as $key => $rand_key ) {
 
 				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-				print( '<div><h6 class="my-0">#' . $i . '</h6></div>' );
+				print( '<div><h3 class="my-0">#' . $i . '</h3></div>' );
 				if ( $sheetData ) {
 
 					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
@@ -405,7 +415,7 @@
 			foreach ( $rand_keys as $key => $rand_key ) {
 
 				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-				print( '<div><h6 class="my-0">#' . $i . '</h6></div>' );
+				print( '<div><h3 class="my-0">#' . $i . '</h3></div>' );
 				if ( $sheetData ) {
 
 					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
@@ -442,7 +452,7 @@
 			foreach ( $rand_keys as $key => $rand_key ) {
 
 				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-				print( '<div><h6 class="my-0">#' . $i . '</h6></div>' );
+				print( '<div><h3 class="my-0">#' . $i . '</h3></div>' );
 				if ( $sheetData ) {
 
 					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
