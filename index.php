@@ -221,11 +221,11 @@
 
 		if ( ( $titulares + $suplentes ) <= $total ) {
 
-			// 2 defensoras del pueblo (titular y suplente)
-			// 2 secretarias (titular y suplente)
-			// 2 prosecretarias legislativas (titular y suplente)
-			// 2 prosecretarias administrativas (titular y suplente)
-			$cantidadExtra = 8;
+			// 1 defensoras del pueblo (titular)
+			// 1 secretarias (titular)
+			// 1 prosecretarias legislativas (titular)
+			// 1 prosecretarias administrativas (titular)
+			$cantidadExtra = 4;
 
 			$rand_keys = array_rand( $input, $titulares + $suplentes + $cantidadExtra );
 			$i         = 1;
@@ -310,48 +310,11 @@
 			print( '</ul>' );
 			print( '</div>' );
 
-			// Secretarias
+			// Secretaria
 
 			print( '<div class="col-md-6 mb-6">' );
 			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
 			print( '<span class="text-muted">Secretaria</span>' );
-			print( '</h4>' );
-			print( '<ul class="list-group mb-3">' );
-			print( '
-				<li class="list-group-item d-flex justify-content-between">
-                    <span>Posición</span>
-                    <strong>' . $etiquetaColumna2 . '</strong>
-                </li>
-				' );
-
-			foreach ( $rand_keys as $key => $rand_key ) {
-
-				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-				print( '<div><h6 class="my-0">#' . $i . '</h6></div>' );
-				if ( $sheetData ) {
-
-					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
-				} else {
-
-					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
-				}
-
-				print( '</li>' );
-
-				unset( $rand_keys[ $key ] );
-
-				$i ++;
-
-				break;
-			}
-
-
-			print( '</ul>' );
-			print( '</div>' );
-
-			print( '<div class="col-md-6 mb-6">' );
-			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
-			print( '<span class="text-muted">Secretaria Suplente</span>' );
 			print( '</h4>' );
 			print( '<ul class="list-group mb-3">' );
 			print( '
@@ -391,43 +354,6 @@
 			print( '<div class="col-md-6 mb-6">' );
 			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
 			print( '<span class="text-muted">Defensora del Pueblo</span>' );
-			print( '</h4>' );
-			print( '<ul class="list-group mb-3">' );
-			print( '
-				<li class="list-group-item d-flex justify-content-between">
-                    <span>Posición</span>
-                    <strong>' . $etiquetaColumna2 . '</strong>
-                </li>
-				' );
-
-			foreach ( $rand_keys as $key => $rand_key ) {
-
-				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-				print( '<div><h6 class="my-0">#' . $i . '</h6></div>' );
-				if ( $sheetData ) {
-
-					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
-				} else {
-
-					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
-				}
-
-				print( '</li>' );
-
-				unset( $rand_keys[ $key ] );
-
-				$i ++;
-
-				break;
-			}
-
-
-			print( '</ul>' );
-			print( '</div>' );
-
-			print( '<div class="col-md-6 mb-6">' );
-			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
-			print( '<span class="text-muted">Defensora del Pueblo Suplente</span>' );
 			print( '</h4>' );
 			print( '<ul class="list-group mb-3">' );
 			print( '
