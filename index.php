@@ -312,10 +312,10 @@
 
 				print( '</li>' );
 
-//				unset( $rand_keys[ $rand_key ] );
+//				unset( $rand_keys[ $key ] );
 
-				if (($key = array_search($rand_key, $rand_keys)) !== false) {
-					unset($rand_keys[$key]);
+				if (($uKey = array_search($rand_key, $rand_keys)) !== false) {
+					unset($rand_keys[$uKey]);
 				}
 
 				$i ++;
@@ -358,7 +358,7 @@
 
 				print( '</li>' );
 
-				unset( $rand_keys[ $rand_key ] );
+				unset( $rand_keys[ $key ] );
 
 				$i ++;
 			}
@@ -371,7 +371,7 @@
 
 			print( '<div class="col-md-6 mb-6">' );
 			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
-			print( '<span class="text-muted">Secretaria</span>' );
+			print( '<span class="text-muted">Secretario</span>' );
 			print( '</h4>' );
 			print( '<ul class="list-group mb-3">' );
 			print( '
@@ -408,7 +408,7 @@
 
 			print( '<div class="col-md-6 mb-6">' );
 			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
-			print( '<span class="text-muted">Secretaria Suplente</span>' );
+			print( '<span class="text-muted">Secretario Suplente</span>' );
 			print( '</h4>' );
 			print( '<ul class="list-group mb-3">' );
 			print( '
@@ -447,7 +447,7 @@
 
 			print( '<div class="col-md-6 mb-6">' );
 			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
-			print( '<span class="text-muted">Defensora del Pueblo</span>' );
+			print( '<span class="text-muted">Defensor del Pueblo</span>' );
 			print( '</h4>' );
 			print( '<ul class="list-group mb-3">' );
 			print( '
@@ -484,7 +484,7 @@
 
 			print( '<div class="col-md-6 mb-6">' );
 			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
-			print( '<span class="text-muted">Defensora del Pueblo Suplente</span>' );
+			print( '<span class="text-muted">Defensor del Pueblo Suplente</span>' );
 			print( '</h4>' );
 			print( '<ul class="list-group mb-3">' );
 			print( '
@@ -523,7 +523,7 @@
 
 			print( '<div class="col-md-6 mb-6">' );
 			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
-			print( '<span class="text-muted">Pro Secretaria Legislativa</span>' );
+			print( '<span class="text-muted">Pro Secretari Legislativa</span>' );
 			print( '</h4>' );
 			print( '<ul class="list-group mb-3">' );
 			print( '
@@ -560,7 +560,7 @@
 
 			print( '<div class="col-md-6 mb-6">' );
 			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
-			print( '<span class="text-muted">Pro Secretaria Administrativa</span>' );
+			print( '<span class="text-muted">Pro Secretario Administrativa</span>' );
 			print( '</h4>' );
 			print( '<ul class="list-group mb-3">' );
 			print( '
