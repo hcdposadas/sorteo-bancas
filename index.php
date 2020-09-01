@@ -217,7 +217,15 @@
 
 			unset( $sheetData[0] );
 
+//			dejo fijo a fores
+			$unico = $sheetData[1];
+//			elimino a fores
+			unset($sheetData[1]);
+
 			shuffle( $sheetData );
+
+//			dejo fijo a forés
+			array_unshift($sheetData , $unico);
 
 			$total            = count( $sheetData );
 			$etiquetaColumna2 = 'Nombre, Apellido y DNI';
@@ -239,6 +247,14 @@
 			$cantidadExtra = 8;
 
 			$rand_keys = array_rand( $input, $titulares + $suplentes + $cantidadExtra );
+
+//			elimino a fores de randkeys
+
+			if (($key = array_search(0, $rand_keys)) !== false) {
+				unset($rand_keys[$key]);
+			}
+
+
 			$i         = 1;
 
 //			7 concejales titulares masculinos y 7 femeninos
@@ -246,15 +262,15 @@
 			$femenino       = 0;
 			$masculino      = 0;
 			$keysConcejales = [];
-			$index          = 0;
-			while ( $sonCatorce < 14 ) {
+			$index          = 1;
+			while ( $sonCatorce < 13 ) {
 
 				if ( $sheetData[ $index ][3] == 'Femenino' && $femenino < 7 ) {
 					$femenino ++;
 					$keysConcejales[] = $index;
 				}
 
-				if ( $sheetData[ $index ][3] == 'Masculino' && $masculino < 7 ) {
+				if ( $sheetData[ $index ][3] == 'Masculino' && $masculino < 6 ) {
 					$masculino ++;
 					$keysConcejales[] = $index;
 				}
@@ -265,9 +281,9 @@
 				$index ++;
 			}
 			shuffle($keysConcejales);
+//			dejo fijo a forés
+			array_unshift($keysConcejales , 0);
 
-
-//			print '<pre> Fem: ' . $femenino . 'Masc: ' . $femenino . ' ' . print_r( $keysConcejales ) . '</pre>';
 			print( '<div class="col-md-6 mb-6">' );
 			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
 			print( '<span class="text-muted">Titulares</span>' );
@@ -342,7 +358,7 @@
 
 				print( '</li>' );
 
-				unset( $rand_keys[ $key ] );
+				unset( $rand_keys[ $rand_key ] );
 
 				$i ++;
 			}
