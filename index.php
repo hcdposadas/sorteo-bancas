@@ -110,7 +110,7 @@
 	$concejales = [
 		1  => 'Alcaráz, Mario',
 		2  => 'Arjol, Martin',
-		3  => 'Barrios, Diego',
+		3  => 'Julien, Marcelo',
 		4  => 'Dachary, Mariela',
 		5  => 'De Arrechea, Rodrigo',
 		6  => 'Florindo, Maximiliano',
