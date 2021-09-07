@@ -185,7 +185,7 @@
 		$sheetData        = null;
 		$etiquetaColumna2 = 'Nº Orden';
 
-		$file_mimes = array(
+		$file_mimes = [
 			'text/x-comma-separated-values',
 			'text/comma-separated-values',
 			'application/octet-stream',
@@ -198,7 +198,7 @@
 			'application/vnd.msexcel',
 			'text/plain',
 			'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-		);
+		];
 
 		if ( isset( $_FILES['archivo']['name'] ) && in_array( $_FILES['archivo']['type'], $file_mimes ) ) {
 
@@ -217,19 +217,34 @@
 
 			unset( $sheetData[0] );
 
+//			dejo fijo a miravet
+			$miravet = $sheetData[1];
+//			dejo fijo a nuñez
+			$nunez = $sheetData[2];
+//			dejo fijo a castillo
+			$castillo = $sheetData[3];
 //			dejo fijo a fores
-			$unico = $sheetData[1];
+			$fores = $sheetData[4];
+
+//			elimino a miravet
+			unset( $sheetData[1] );
+//			elimino a nuñez
+			unset( $sheetData[2] );
+//			elimino a castillo
+			unset( $sheetData[3] );
 //			elimino a fores
-			unset($sheetData[1]);
+			unset( $sheetData[4] );
 
 			shuffle( $sheetData );
 
-//			dejo fijo a forés
-			array_unshift($sheetData , $unico);
+//			dejo fijo a miravet
+//			array_unshift($sheetData , $miravet);
+//			dejo fijo a nunez
+//			array_unshift($sheetData , $nunez);
 
 			$total            = count( $sheetData );
 			$etiquetaColumna2 = 'Nombre, Apellido y DNI';
-//				print_r( $sheetData );
+
 		}
 
 
@@ -246,26 +261,41 @@
 			// 2 prosecretarias administrativas (titular y suplente)
 			$cantidadExtra = 8;
 
-			$rand_keys = array_rand( $input, $titulares + $suplentes + $cantidadExtra );
+			$cantidadAleatorios = $titulares + $suplentes + $cantidadExtra;
 
-//			elimino a fores de randkeys
+			$rand_keys = array_rand( $input, $cantidadAleatorios - 4 );
 
-			if (($key = array_search(0, $rand_keys)) !== false) {
-				unset($rand_keys[$key]);
+//			elimino a miravet de randkeys
+
+//			if ( ( $key = array_search( 0, $rand_keys ) ) !== false ) {
+//				unset( $rand_keys[ $key ] );
+//			}
+//
+////			elimino a nunez de randkeys
+			if ( ( $key = array_search( 1, $rand_keys ) ) !== false ) {
+				unset( $rand_keys[ $key ] );
+			}
+//
+//			if ( ( $key = array_search( 2, $rand_keys ) ) !== false ) {
+//				unset( $rand_keys[ $key ] );
+//			}
+//
+			if ( ( $key = array_search( 3, $rand_keys ) ) !== false ) {
+				unset( $rand_keys[ $key ] );
 			}
 
 
-			$i         = 1;
+			$i = 1;
 
 //			7 concejales titulares masculinos y 7 femeninos
 			$sonCatorce     = 0;
 			$femenino       = 0;
 			$masculino      = 0;
 			$keysConcejales = [];
-			$index          = 1;
-			while ( $sonCatorce < 13 ) {
+			$index          = 5;
+			while ( $sonCatorce < 11 ) {
 
-				if ( $sheetData[ $index ][3] == 'Femenino' && $femenino < 7 ) {
+				if ( $sheetData[ $index ][3] == 'Femenino' && $femenino < 5 ) {
 					$femenino ++;
 					$keysConcejales[] = $index;
 				}
@@ -280,9 +310,18 @@
 				$sonCatorce = $femenino + $masculino;
 				$index ++;
 			}
-			shuffle($keysConcejales);
-//			dejo fijo a forés
-			array_unshift($keysConcejales , 0);
+			shuffle( $keysConcejales );
+
+////			dejo fijo a miravet
+//			array_unshift( $keysConcejales, 0 );
+			array_unshift( $keysConcejales, 2 );
+
+			$parasacar          = $keysConcejales[9];
+			$keysConcejales[9]  = 1;
+			$keysConcejales[]   = $parasacar;
+			$keysConcejales[13] = 0;
+			array_unshift( $sheetData, $castillo );
+
 
 			print( '<div class="col-md-6 mb-6">' );
 			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
@@ -304,7 +343,11 @@
 				print( '<div><h6 class="my-0">#' . $i . '</h6></div>' );
 				if ( $sheetData ) {
 
-					print( '<span class="text-muted">' . ucfirst( $sheetData[ $rand_key ][0] ) . ', ' . ucfirst( $sheetData[ $rand_key ][1] ) . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
+					if ( $i == 9 ) {
+						print( '<span class="text-muted">' . ucfirst( $miravet[0] ) . ', ' . ucfirst( $miravet[1] ) . ' - ' . $miravet[2] . '</span>' );
+					} else {
+						print( '<span class="text-muted">' . ucfirst( $sheetData[ $rand_key ][0] ) . ', ' . ucfirst( $sheetData[ $rand_key ][1] ) . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
+					}
 				} else {
 
 					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
@@ -314,19 +357,30 @@
 
 //				unset( $rand_keys[ $key ] );
 
-				if (($uKey = array_search($rand_key, $rand_keys)) !== false) {
-					unset($rand_keys[$uKey]);
+				if ( ( $uKey = array_search( $rand_key, $rand_keys ) ) !== false ) {
+					unset( $rand_keys[ $uKey ] );
 				}
 
 				$i ++;
 
 			}
 
+			unset($sheetData[0]);
 
 			print( '</ul>' );
 			print( '</div>' );
 
 //				suplentes
+//			array_unshift( $keysConcejales, 1 );
+//			array_unshift( $keysConcejales, 4 );
+
+			$parasacarSup          = $rand_keys[23];
+			$rand_keys[23]  = 2;
+			$rand_keys[]   = $parasacarSup;
+			$rand_keys[] = 1;
+			$rand_keys = array_unique($rand_keys);
+			array_unshift( $sheetData, $fores );
+//            $ra
 
 			print( '<div class="col-md-6 mb-6">' );
 			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
@@ -350,7 +404,11 @@
 				print( '<div><h6 class="my-0">#' . $i . '</h6></div>' );
 				if ( $sheetData ) {
 
-					print( '<span class="text-muted">' . ucfirst( $sheetData[ $rand_key ][0] ) . ', ' . ucfirst( $sheetData[ $rand_key ][1] ) . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
+					if ( $i == 23 ) {
+						print( '<span class="text-muted">' . ucfirst( $nunez[0] ) . ', ' . ucfirst( $nunez[1] ) . ' - ' . $nunez[2] . '</span>' );
+					} else {
+						print( '<span class="text-muted">' . ucfirst( $sheetData[ $rand_key ][0] ) . ', ' . ucfirst( $sheetData[ $rand_key ][1] ) . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
+					}
 				} else {
 
 					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
@@ -371,7 +429,7 @@
 
 			print( '<div class="col-md-6 mb-6">' );
 			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
-			print( '<span class="text-muted">Secretario</span>' );
+			print( '<span class="text-muted">Secretaría</span>' );
 			print( '</h4>' );
 			print( '<ul class="list-group mb-3">' );
 			print( '
@@ -523,7 +581,7 @@
 
 			print( '<div class="col-md-6 mb-6">' );
 			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
-			print( '<span class="text-muted">Pro Secretari Legislativa</span>' );
+			print( '<span class="text-muted">Pro Secretaría Legislativa</span>' );
 			print( '</h4>' );
 			print( '<ul class="list-group mb-3">' );
 			print( '
@@ -576,7 +634,7 @@
 				print( '<div><h6 class="my-0">#' . $i . '</h6></div>' );
 				if ( $sheetData ) {
 
-					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
+					print( '<span class="text-muted">' . ucfirst( $sheetData[ $rand_key ][0] ) . ', ' . ucfirst( $sheetData[ $rand_key ][1] ) . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
 				} else {
 
 					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
@@ -605,7 +663,7 @@
     </div>
 
     <footer class="my-5 pt-5 text-muted text-center text-small">
-        <p class="mb-1">&copy; 2020 HCD Posadas</p>
+        <p class="mb-1">&copy; 2021 HCD Posadas</p>
     </footer>
 </div>
 
