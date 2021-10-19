@@ -236,7 +236,7 @@
 				// 1 prosecretarias administrativas (titular)
 				$cantidadExtra = 4;
 
-				$rand_keys = array_rand($input, $titulares + $suplentes + $cantidadExtra);
+				$rand_keys = array_rand($input, $total);
 				$i         = 1;
 
 
