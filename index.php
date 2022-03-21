@@ -108,19 +108,19 @@
 
 	if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
 	$concejales = [
-		1  => 'Alcaráz, Mario',
-		2  => 'Arjol, Martin',
-		3  => 'Julien, Marcelo',
-		4  => 'Dachary, Mariela',
-		5  => 'De Arrechea, Rodrigo',
-		6  => 'Florindo, Maximiliano',
-		7  => 'Fonseca, Francisco',
-		8  => 'Haysler, Marlene',
-		9  => 'Lopez Sartori, Facundo',
-		10 => 'Martinez, Ramon',
-		11 => 'Meza, Fernando',
-		12 => 'Olmedo, Omar',
-		13 => 'Repetto, Anahí',
+		1  => 'Martinez, Horacio',
+		2  => 'Haysler, Marlene',
+		3  => 'Jimenez, Maria Eva',
+		4  => 'Vancsik, Daniel',
+		5  => 'Martinez, Ramon',
+		6  => 'Dachary, Mariela',
+		7  => 'Mazal, Malena',
+		8  => 'Argañaraz, Pablo',
+		9  => 'Koch, Santiago',
+		10 => 'Perie, Florentino',
+		11 => 'Lopez Sartori, Facundo',
+		12 => 'Fonseca, Francisco',
+		13 => 'De Arrechea, Rodrigo',
 		14 => 'Velázquez, Pablo',
 	]
 	?>
