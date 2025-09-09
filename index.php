@@ -4,11 +4,72 @@
  * User: matias
  * Date: 03/09/18
  * Time: 11:59
+ *
+ * Versión determinística (simula pero no sortea):
+ * - Muestra spinner y retraso
+ * - Lee el Excel "Hoja de cálculo sin título.xlsx"
+ * - Renderiza RESULTADOS en dos columnas de listas como tu maqueta
  */
 
+require __DIR__ . '/vendor/autoload.php';
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
+// --- Función utilitaria para leer el Excel y devolver filas normalizadas
+function leerResultadosDesdeExcel(string $rutaExcel): array {
+    if (!file_exists($rutaExcel)) {
+        throw new RuntimeException("No se encontró el Excel en: {$rutaExcel}");
+    }
+
+    $spreadsheet = IOFactory::load($rutaExcel);
+    $sheet = $spreadsheet->getActiveSheet();
+
+    // toArray con claves A,B,C... para poder mapear por encabezado
+    $rowsRaw = $sheet->toArray(null, true, true, true);
+    if (!$rowsRaw || count($rowsRaw) < 2) {
+        throw new RuntimeException("El Excel no tiene filas suficientes.");
+    }
+
+    // 1) Encabezados
+    $header = array_shift($rowsRaw);
+    $norm = function($s){ $s = is_string($s)?$s:(string)$s; return preg_replace('/\s+/u',' ',trim($s)); };
+    $H = [];
+    foreach ($header as $col => $title) {
+        $H[$norm($title)] = $col; // "texto" => "A/B/C..."
+    }
+
+    // 2) Columnas esperadas (tal cual tu planilla)
+    $need = [
+        'INSTITUCIÓN EDUCATIVA:'                                             => null,
+        'DATOS CONCEJAL ESTUDIANTIL TITULAR. NOMBRE Y APELLIDO:'             => null,
+        'DATOS CONCEJAL ESTUDIANTIL SUPLENTE. NOMBRE Y APELLIDO:'            => null,
+        'Concejal'                                                           => null,
+    ];
+    foreach ($need as $label => $_) {
+        foreach ($H as $t => $c) {
+            if (mb_strtolower($t,'UTF-8') === mb_strtolower($label,'UTF-8')) {
+                $need[$label] = $c; break;
+            }
+        }
+        if ($need[$label] === null) {
+            throw new RuntimeException("Falta la columna en el Excel: {$label}");
+        }
+    }
+
+    // 3) Armar filas limpias
+    $out = [];
+    foreach ($rowsRaw as $r) {
+        $inst = trim((string)($r[$need['INSTITUCIÓN EDUCATIVA:']] ?? ''));
+        $tit  = trim((string)($r[$need['DATOS CONCEJAL ESTUDIANTIL TITULAR. NOMBRE Y APELLIDO:']] ?? ''));
+        $sup  = trim((string)($r[$need['DATOS CONCEJAL ESTUDIANTIL SUPLENTE. NOMBRE Y APELLIDO:']] ?? ''));
+        $con  = trim((string)($r[$need['Concejal']] ?? ''));
+        if ($inst === '' && $tit === '' && $sup === '' && $con === '') continue;
+
+        $out[] = ['inst'=>$inst, 'tit'=>$tit, 'sup'=>$sup, 'con'=>$con];
+    }
+
+    return $out;
+}
 ?>
-
 <!doctype html>
 <html lang="es">
 <head>
@@ -17,476 +78,186 @@
     <meta name="description" content="Script para el sorteo de bancas">
     <meta name="author" content="HCD Posadas">
     <link rel="icon" href="favicon.png">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
     <title>Sorteo de Bancas</title>
-
-    <!-- Bootstrap core CSS -->
-    <!--    <link href="http://localhost/sorteo-bancas/dist/bundle.js" rel="stylesheet">-->
 
     <script src="./dist/bundle.js"></script>
 
     <style>
-        /*borrar despues de usar el ledsote*/
-        body{
-            font-size: 1.2rem;
-            font-weight: 900;
-        }
-        .text-muted{
-            color: #000 !important;
-        }
+        body { font-size: 1rem; font-weight: 900; }
+        .text-muted { color: #000 !important; }
+        span { text-transform: uppercase; display: inline-flex; align-items: center; }
+        .list-group-item:nth-child(odd) { background-color: #f9f9f9; }
     </style>
-
 </head>
-
 <body class="bg-light">
-
 <div class="container">
-    <div class="py-5 text-center">
-        <img class="d-block mx-auto mb-4" src="./logo.png" alt="logo">
-        <h2>Sorteo de Bancas</h2>
-        <p class="lead">Para el Parlamento de la Mujer
-        </p>
-        <p>
-            (si desea subir una planilla este es el formato válido )<br>
-            <a href="example.xlsx" class="btn btn-primary">
-                <i class="fa fa-file-excel-o"></i> Descargar Ejemplo</a>
-        </p>
+    <div class="py-2 text-center">
+        <img class="d-block mx-auto mb-0" style="width: 200px;"
+             src="logo.png" alt="logo">
+        <h1>Sorteo de Bancas</h1>
+        <h1>Para el Parlamento Estudiantil Inclusivo 2025</h1>
     </div>
 
     <div class="row">
         <div class="col-md-12">
-            <form method="post" name="sorteo" enctype="multipart/form-data">
+        <?php if ($_SERVER['REQUEST_METHOD'] !== 'POST'): ?>
+            <!-- FORM: solo para disparar la simulación -->
+            <form id="sorteoForm" method="post" name="sorteo" enctype="multipart/form-data">
                 <div class="row">
-                    <div class="col-6">
-                        <div class="form-group">
-                            <label for="archivo">Archivo</label>
-                            <div class="custom-file">
-                                <input type="file" name="archivo" class="custom-file-input" id="archivo" lang="es">
-                                <label class="custom-file-label" for="archivo">Seleccionar Archivo</label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="total">Total</label>
-                            <input required type="number" name="total" class="form-control" id="total"
-                                   aria-describedby="total"
-                                   value="<?php ( isset( $_POST['total'] ) ) ? print $_POST['total'] : print '0' ?>">
-                            <small id="totalHelpBlock" class="form-text text-muted">
-                                Si se sube la planilla este valor será ignorado.
-                            </small>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="form-group">
-                            <label for="titulares">Titulares</label>
-                            <input required type="number" name="titulares" class="form-control" id="titulares"
-                                   value="<?php ( isset( $_POST['titulares'] ) ) ? print $_POST['titulares'] : print '14' ?>">
-
-                        </div>
-                        <div class="form-group">
-                            <label for="suplentes">Suplentes</label>
-                            <input required type="number" name="suplentes" class="form-control" id="suplentes"
-                                   value="<?php ( isset( $_POST['suplentes'] ) ) ? print $_POST['suplentes'] : print '14' ?>">
-
-                        </div>
+                    <div id="listaInscriptos" style="padding-left:40px"
+                         class="col-md-12 card p-8 mt-4 mb-4 bg-light shadow border border-muted text-center text-muted rounded">
+                        <h3 class="text-center m-4">LISTA DE INSCRIPTOS</h3>
+                        <ol style="column-count: 2; padding-left: 20px;">
+                            <li>AGUIRRE JOSÉ NICOLAS</li>
+                            <li>AMARILLA BARBOZA MAXIMILIANO RUBEN HERNANDO</li>
+                            <li>ANTONELLA MENDEZ</li>
+                            <li>ASAÍ ABIGAIL LOPEZ</li>
+                            <li>AYMARA MICAELA LUGO</li>
+                            <li>BARBIERI ANNA</li>
+                            <li>BARREIRO LAUTARO EZEQUIEL</li>
+                            <li>BENITEZ AGUSTINA</li>
+                            <li>BENITEZ MARCOS NAHUEL</li>
+                            <li>BRAGA ARIANA</li>
+                            <li>BYS, PABLO EMANUEL</li>
+                            <li>CANDELA TOMAS</li>
+                            <li>CARVALLO THOMAS</li>
+                            <li>CELESTE MONSERRATH VALLEJOS</li>
+                            <li>CROUCCIEE SANTINO HORACIO</li>
+                            <li>DE SANCTIS, DONATO AUGUSTO</li>
+                            <li>DECHAT THEISEN ELIAS ANGEL</li>
+                            <li>ELIAS GALARZA</li>
+                            <li>ELIAS JOAQUÍN GALARZA</li>
+                            <li>ENRIQUEZ ROCÍO BELÉN</li>
+                            <li>FAUSTO MARTINEZ</li>
+                            <li>FIGUEROA ESCALANTE MARÍA FERNANDA</li>
+                            <li>GASTON JASAEL HOFMARKSRICHTER</li>
+                            <li>IRALA LEONEL</li>
+                            <li>KAREN ITATI ANZOASTEGUI</li>
+                            <li>KULCSAR DANIELA VICTORIA</li>
+                            <li>LUCIANO BARRIOS</li>
+                            <li>LUCIANO FABIAN BARRIOS</li>
+                            <li>LUCAS BAUTISTA ZACH</li>
+                            <li>LUCIA ITATÍ SAMUDIO</li>
+                            <li>MAIRA MAGALI MENDEZ</li>
+                            <li>MERENDA NAZARENA CRISTINA</li>
+                            <li>NUÑEZ LARA VALENTINA</li>
+                            <li>OBISPO MIJAIL ALEJANDRO</li>
+                            <li>ORREGO CHIRIVE AYLEN</li>
+                            <li>OSINSKI DAVID</li>
+                            <li>PABLO EMANUEL BYS</li>
+                            <li>RODRIGUEZ EVELYN ANISIA</li>
+                            <li>ROMERO ULISES</li>
+                            <li>SAMUDIO ANTONELA NOELIA</li>
+                            <li>SOFÍA ETCHEGOIN</li>
+                            <li>TAMARA DAHIANA BETTKER</li>
+                            <li>TRINIDAD VALERIA</li>
+                            <li>VARELA DALIA VANESA MAILEN</li>
+                            <li>VIANA XIUMARA NAOMI</li>
+                            <li>VICENTE ERNESTINA GIANELLA</li>
+                            <li>VICTORIA CORREA</li>
+                            <li>VILLALBA ADRIANO JOSEMIR</li>
+                            <li>VILLALBA ANYELEN AIMARA</li>
+                        </ol>
                     </div>
                 </div>
 
-                <button class="btn btn-primary btn-lg btn-block" type="submit">Realizar Sorteo</button>
+                <button id="submitBtn" class="btn btn-primary btn-lg btn-block" type="submit">Realizar Sorteo</button>
+                <div id="spinner" class="text-center mt-4" style="display:none;">
+                    <div class="spinner-border" role="status">
+                        <span class="sr-only">Cargando...</span>
+                    </div>
+                </div>
             </form>
+        <?php else: ?>
+            <?php
+            // === POST: simulación ya corrió; ahora mostrar resultado desde Excel ===
+            $error = null; $resultados = [];
+            try {
+                $resultados = leerResultadosDesdeExcel(__DIR__ . '/Hoja de cálculo sin título.xlsx');
+            } catch (Throwable $e) {
+                $error = $e->getMessage();
+            }
+
+            // Partir en dos listas como tu maqueta: la primera con 9 bancas, el resto en la segunda
+            $primerBloque = array_slice($resultados, 0, 9);
+            $segundoBloque = array_slice($resultados, 9);
+
+            // Render helper para un bloque de filas
+            $renderBloque = function(array $filas, int $offsetBanca = 0) {
+                // Título
+                echo '<ul class="list-group mb-3 shadow">';
+                echo '<li class="list-group-item" style="display:grid;grid-template-columns:80px 1fr 1fr 1.5fr;">';
+                echo '<span>Banca</span><strong>Concejal</strong><strong>Titular</strong><strong>Institución</strong>';
+                echo '</li>';
+
+                foreach ($filas as $idx => $r) {
+                    $banca = $offsetBanca + $idx + 1;
+                    $concejal = strtoupper($r['con']);
+                    $tit = $r['tit'];
+                    $institucion = $r['inst'];
+                    echo '<li class="list-group-item lh-condensed" style="display:grid;grid-template-columns:80px 1fr 1fr 1.5fr;border-top:1px solid #ccc;">';
+                    echo '<div><h3 class="my-0">#' . $banca . '</h3></div>';
+                    echo '<span class="text-muted">' . htmlspecialchars($concejal) . '</span>';
+                    echo '<span class="text-muted">' . htmlspecialchars($tit) . '</span>';
+                    echo '<span class="text-muted">' . htmlspecialchars($institucion) . '</span>';
+                    echo '</li>';
+                }
+
+                echo '</ul>';
+            };
+            ?>
+
+            <div class="row mt-1">
+                <div class="col-md-12 mb-6">
+                    <h4 class="d-flex justify-content-center align-items-center mb-3">
+                        <span class="text-muted">RESULTADOS</span>
+                    </h4>
+
+                    <?php if ($error): ?>
+                        <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+                    <?php else: ?>
+                        <?php
+                        // Primer bloque (1..9)
+                        $renderBloque($primerBloque, 0);
+                        // Segundo bloque (10..N)
+                        if (!empty($segundoBloque)) {
+                            echo '<div style="margin-top:40px;">';
+                            $renderBloque($segundoBloque, 9);
+                            echo '</div>';
+                        }
+                        ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endif; ?>
         </div>
-    </div>
-
-
-	<?php
-
-	require 'vendor/autoload.php';
-
-	use PhpOffice\PhpSpreadsheet\Spreadsheet;
-	use PhpOffice\PhpSpreadsheet\Reader\Csv;
-	use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
-
-
-	if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
-	$concejales = [
-		1  => 'Martinez, Horacio',
-		2  => 'Haysler, Marlene',
-		3  => 'Jimenez, Maria Eva',
-		4  => 'Vancsik, Daniel',
-		5  => 'Martinez, Ramon',
-		6  => 'Dachary, Mariela',
-		7  => 'Mazal, Malena',
-		8  => 'Argañaraz, Pablo',
-		9  => 'Koch, Santiago',
-		10 => 'Perie, Florentino',
-		11 => 'Lopez Sartori, Facundo',
-		12 => 'Fonseca, Francisco',
-		13 => 'De Arrechea, Rodrigo',
-		14 => 'Velázquez, Pablo',
-	]
-	?>
-
-    <div class="row mt-1">
-        <div class="col-md-6 mb-6">
-            <h4 class="d-flex justify-content-between align-items-center mb-3">
-                <span class="text-muted">Referencia</span>
-            </h4>
-            <ul class="list-group mb-3">
-                <li class="list-group-item d-flex justify-content-between">
-                    <span>Banca</span>
-                    <strong>Concejal</strong>
-                </li>
-				<?php
-				foreach ( $concejales as $n => $concejal ) {
-
-					if ( $n > 7 ) {
-						break;
-					}
-
-					print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-					print( '<div><h3 class="my-0">#' . $n . '</h3></div>' );
-					print( '<span class="text-muted">' . $concejal . '</span>' );
-
-					print( '</li>' );
-
-					unset( $concejales[ $n ] );
-				}
-				?>
-            </ul>
-        </div>
-        <div class="col-md-6 mb-6">
-            <h4 class="d-flex justify-content-between align-items-center mb-3">
-                <span class="text-muted">Referencia</span>
-            </h4>
-            <ul class="list-group mb-3">
-                <li class="list-group-item d-flex justify-content-between">
-                    <span>Banca</span>
-                    <strong>Concejal</strong>
-                </li>
-				<?php
-				foreach ( $concejales as $n => $concejal ) {
-
-					print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-					print( '<div><h3 class="my-0">#' . $n . '</h3></div>' );
-					print( '<span class="text-muted">' . $concejal . '</span>' );
-
-					print( '</li>' );
-				}
-				?>
-            </ul>
-        </div>
-    </div>
-
-    <div class="row mt-1">
-		<?php
-
-
-		$total            = $_POST['total'];
-		$sheetData        = null;
-		$etiquetaColumna2 = 'Nº Orden';
-
-		$file_mimes = array(
-			'text/x-comma-separated-values',
-			'text/comma-separated-values',
-			'application/octet-stream',
-			'application/vnd.ms-excel',
-			'application/x-csv',
-			'text/x-csv',
-			'text/csv',
-			'application/csv',
-			'application/excel',
-			'application/vnd.msexcel',
-			'text/plain',
-			'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-		);
-
-		if ( isset( $_FILES['archivo']['name'] ) && in_array( $_FILES['archivo']['type'], $file_mimes ) ) {
-
-			$arr_file  = explode( '.', $_FILES['archivo']['name'] );
-			$extension = end( $arr_file );
-
-			if ( 'csv' == $extension ) {
-				$reader = new \PhpOffice\PhpSpreadsheet\Reader\Csv();
-			} else {
-				$reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
-			}
-
-			$spreadsheet = $reader->load( $_FILES['archivo']['tmp_name'] );
-
-			$sheetData = $spreadsheet->getActiveSheet()->toArray();
-
-			unset( $sheetData[0] );
-
-			shuffle( $sheetData );
-
-			$total            = count( $sheetData );
-			$etiquetaColumna2 = 'Nombre, Apellido y DNI';
-//				print_r( $sheetData );
-		}
-
-
-		$titulares = $_POST['titulares'];
-		$suplentes = $_POST['suplentes'];
-
-		$input = range( 1, $total );
-
-		if ( ( $titulares + $suplentes ) <= $total ) {
-
-			// 1 defensoras del pueblo (titular)
-			// 1 secretarias (titular)
-			// 1 prosecretarias legislativas (titular)
-			// 1 prosecretarias administrativas (titular)
-			$cantidadExtra = 4;
-
-			$rand_keys = array_rand( $input, $titulares + $suplentes + $cantidadExtra );
-			$i         = 1;
-
-
-			print( '<div class="col-md-6 mb-6">' );
-			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
-			print( '<span class="text-muted">Titulares</span>' );
-			print( '</h4>' );
-			print( '<ul class="list-group mb-3">' );
-			print( '
-				<li class="list-group-item d-flex justify-content-between">
-                    <span>Posición</span>
-                    <strong>' . $etiquetaColumna2 . '</strong>
-                </li>
-				' );
-
-			foreach ( $rand_keys as $key => $rand_key ) {
-				if ( $i > $titulares ) {
-					break;
-				}
-				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-				print( '<div><h3 class="my-0">#' . $i . '</h3></div>' );
-				if ( $sheetData ) {
-
-					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
-				} else {
-
-					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
-				}
-
-				print( '</li>' );
-
-				unset( $rand_keys[ $key ] );
-
-				$i ++;
-
-			}
-
-
-			print( '</ul>' );
-			print( '</div>' );
-
-//				suplentes
-
-			print( '<div class="col-md-6 mb-6">' );
-			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
-			print( '<span class="text-muted">Suplentes</span>' );
-			print( '</h4>' );
-			print( '<ul class="list-group mb-3">' );
-			print( '
-				<li class="list-group-item d-flex justify-content-between">
-                    <span>Posición</span>
-                    <strong>' . $etiquetaColumna2 . '</strong>
-                </li>
-				' );
-
-			foreach ( $rand_keys as $key => $rand_key ) {
-
-				if ( $i > ( $suplentes + $titulares ) ) {
-					break;
-				}
-
-				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-				print( '<div><h3 class="my-0">#' . $i . '</h3></div>' );
-				if ( $sheetData ) {
-
-					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
-				} else {
-
-					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
-				}
-
-				print( '</li>' );
-
-				unset( $rand_keys[ $key ] );
-
-				$i ++;
-			}
-
-
-			print( '</ul>' );
-			print( '</div>' );
-
-			// Secretaria
-
-			print( '<div class="col-md-6 mb-6">' );
-			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
-			print( '<span class="text-muted">Secretaria</span>' );
-			print( '</h4>' );
-			print( '<ul class="list-group mb-3">' );
-			print( '
-				<li class="list-group-item d-flex justify-content-between">
-                    <span>Posición</span>
-                    <strong>' . $etiquetaColumna2 . '</strong>
-                </li>
-				' );
-
-			foreach ( $rand_keys as $key => $rand_key ) {
-
-				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-				print( '<div><h3 class="my-0">#' . $i . '</h3></div>' );
-				if ( $sheetData ) {
-
-					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
-				} else {
-
-					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
-				}
-
-				print( '</li>' );
-
-				unset( $rand_keys[ $key ] );
-
-				$i ++;
-
-				break;
-			}
-
-
-			print( '</ul>' );
-			print( '</div>' );
-
-			// Defensoras del pueblo
-
-			print( '<div class="col-md-6 mb-6">' );
-			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
-			print( '<span class="text-muted">Defensora del Pueblo</span>' );
-			print( '</h4>' );
-			print( '<ul class="list-group mb-3">' );
-			print( '
-				<li class="list-group-item d-flex justify-content-between">
-                    <span>Posición</span>
-                    <strong>' . $etiquetaColumna2 . '</strong>
-                </li>
-				' );
-
-			foreach ( $rand_keys as $key => $rand_key ) {
-
-				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-				print( '<div><h3 class="my-0">#' . $i . '</h3></div>' );
-				if ( $sheetData ) {
-
-					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
-				} else {
-
-					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
-				}
-
-				print( '</li>' );
-
-				unset( $rand_keys[ $key ] );
-
-				$i ++;
-
-				break;
-			}
-
-
-			print( '</ul>' );
-			print( '</div>' );
-
-			// Prosecretarias
-
-			print( '<div class="col-md-6 mb-6">' );
-			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
-			print( '<span class="text-muted">Pro Secretaria Legislativa</span>' );
-			print( '</h4>' );
-			print( '<ul class="list-group mb-3">' );
-			print( '
-				<li class="list-group-item d-flex justify-content-between">
-                    <span>Posición</span>
-                    <strong>' . $etiquetaColumna2 . '</strong>
-                </li>
-				' );
-
-			foreach ( $rand_keys as $key => $rand_key ) {
-
-				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-				print( '<div><h3 class="my-0">#' . $i . '</h3></div>' );
-				if ( $sheetData ) {
-
-					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
-				} else {
-
-					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
-				}
-
-				print( '</li>' );
-
-				unset( $rand_keys[ $key ] );
-
-				$i ++;
-
-				break;
-			}
-
-
-			print( '</ul>' );
-			print( '</div>' );
-
-			print( '<div class="col-md-6 mb-6">' );
-			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
-			print( '<span class="text-muted">Pro Secretaria Administrativa</span>' );
-			print( '</h4>' );
-			print( '<ul class="list-group mb-3">' );
-			print( '
-				<li class="list-group-item d-flex justify-content-between">
-                    <span>Posición</span>
-                    <strong>' . $etiquetaColumna2 . '</strong>
-                </li>
-				' );
-
-			foreach ( $rand_keys as $key => $rand_key ) {
-
-				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-				print( '<div><h3 class="my-0">#' . $i . '</h3></div>' );
-				if ( $sheetData ) {
-
-					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
-				} else {
-
-					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
-				}
-
-				print( '</li>' );
-
-				unset( $rand_keys[ $key ] );
-
-				$i ++;
-
-				break;
-			}
-
-
-			print( '</ul>' );
-			print( '</div>' );
-
-
-		}
-		//			if principal
-
-		}
-		?>
-
     </div>
 
     <footer class="my-5 pt-5 text-muted text-center text-small">
-        <p class="mb-1">&copy; <?php print date('Y');?> HCD Posadas</p>
+        <p class="mb-1">&copy; <?php print date('Y'); ?> HCD Posadas</p>
     </footer>
 </div>
 
+<?php if ($_SERVER['REQUEST_METHOD'] !== 'POST'): ?>
+<script>
+  // Simulación del "sorteo": spinner + retardo, luego POST real
+  const form = document.getElementById('sorteoForm');
+  form.addEventListener('submit', function (event) {
+    event.preventDefault(); // evitar envío inmediato
+
+    const lista = document.getElementById('listaInscriptos');
+    if (lista) lista.style.display = 'none';
+
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('spinner').style.display = 'block';
+
+    // Retardo artificial para el show (2s)
+    setTimeout(() => { event.target.submit(); }, 2000);
+  });
+</script>
+<?php endif; ?>
 </body>
 </html>
+

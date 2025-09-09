@@ -4,9 +4,9 @@
   "description": "Sorteo de Bancas",
   "main": "webpack.config.js",
   "scripts": {
-    "watch": "./node_modules/.bin/webpack --env=\"development\" -w",
-    "dev": "./node_modules/.bin/webpack --env=\"development\"",
-    "prod": "./node_modules/.bin/webpack --env=\"production\""
+    "watch": "webpack --env=\"development\" --watch",
+    "dev": "webpack --env=\"development\"",
+    "prod": "webpack --env=\"production\""
   },
   "keywords": [
     "sorteo"
@@ -14,20 +14,21 @@
   "author": "Matias Solis de la Torre",
   "license": "MIT",
   "dependencies": {
-    "bootstrap": "^4.1.3",
+    "bootstrap": "^4.6.0",
     "font-awesome": "^4.7.0",
-    "jquery": "^3.3.1",
-    "popper.js": "^1.14.4"
+    "jquery": "^3.6.0",
+    "popper.js": "^1.16.1"
   },
   "devDependencies": {
-    "css-loader": "^0.28.11",
-    "exports-loader": "^0.7.0",
-    "file-loader": "^1.1.11",
-    "node-sass": "^4.9.0",
-    "postcss-loader": "^3.0.0",
-    "sass-loader": "^7.1.0",
-    "style-loader": "^0.21.0",
-    "url-loader": "^1.1.1",
-    "webpack": "^3.12.0"
+    "css-loader": "^6.7.1",
+    "exports-loader": "^4.0.0",
+    "file-loader": "^6.2.0",
+    "postcss-loader": "^7.0.0",
+    "sass": "^1.56.1",
+    "sass-loader": "^13.2.0",
+    "style-loader": "^3.3.1",
+    "url-loader": "^4.1.1",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0"
   }
 }

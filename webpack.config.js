@@ -1,8 +1,10 @@
-const webpack = require('webpack')
 const path = require('path');
 
 module.exports = function(env) {
+    const isProduction = env === 'production';
+    
     return {
+        mode: isProduction ? 'production' : 'development',
         entry: "./src/js/app.js",
         output: {
             path: path.resolve(__dirname, "dist"),
@@ -10,34 +12,46 @@ module.exports = function(env) {
             publicPath: 'dist/'
         },
         module: {
-            loaders: [
+            rules: [
                 {
                     test: /\.(scss)$/,
-                    use: [{
-                        loader: 'style-loader', // inject CSS to page
-                    }, {
-                        loader: 'css-loader', // translates CSS into CommonJS modules
-                    },  {
-                        loader: 'sass-loader' // compiles Sass to CSS
-                    }]
+                    use: [
+                        'style-loader',
+                        'css-loader',
+                        {
+                            loader: 'sass-loader',
+                            options: {
+                                implementation: require('sass'),
+                                sassOptions: {
+                                    fiber: false
+                                }
+                            }
+                        }
+                    ]
                 },
                 {
                     test: /\.css$/,
                     use: [
                         'style-loader',
-                        { loader: 'css-loader', options: { importLoaders: 1 } },
+                        { 
+                            loader: 'css-loader', 
+                            options: { importLoaders: 1 } 
+                        },
                         'postcss-loader'
                     ]
                 },
                 {
-                    test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-                    loader: 'url-loader?limit=10000&mimetype=application/font-woff'
-                },
-                {
-                    test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-                    loader: 'file-loader'
+                    test: /\.(woff|woff2|eot|ttf|otf|svg)$/i,
+                    type: 'asset/resource',
+                    generator: {
+                        filename: 'fonts/[name][ext]'
+                    }
                 }
             ]
         },
-    }
-}
+        devtool: isProduction ? 'source-map' : 'eval-source-map',
+        stats: {
+            errorDetails: true
+        }
+    };
+};
