@@ -304,12 +304,14 @@ $renderBloque = function(array $filas, int $offsetBanca = 0) {
             // Personas con posiciones fijas
             $fijos = [
                 'DE LA VEGA MARÍA ELISA' => 'titular',
-                'FLORENTÍN GONZALEZ MARÍA HILDA' => 'suplente'
+                'FLORENTÍN GONZALEZ MARÍA HILDA' => 'suplente',
+                'BARBOZA MARIA HORTENSIA' => 'titular_hector'
             ];
             
             // Buscar a las personas fijas en la lista completa de participantes
             $titularFijo = null;
             $suplenteFijo = null;
+            $barbozaHortensia = null;
             
             foreach ($participantesConDni as $participante) {
                 if (strpos($participante, 'DE LA VEGA MARÍA ELISA|') === 0) {
@@ -318,14 +320,18 @@ $renderBloque = function(array $filas, int $offsetBanca = 0) {
                 if (strpos($participante, 'FLORENTÍN GONZALEZ MARÍA HILDA|') === 0) {
                     $suplenteFijo = $participante;
                 }
+                if (strpos($participante, 'BARBOZA MARIA HORTENSIA|') === 0) {
+                    $barbozaHortensia = $participante;
+                }
             }
             
             // Filtrar participantes para el sorteo (excluyendo a los especificados y los de posiciones fijas)
-            $participantesSorteo = array_filter($participantesConDni, function($item) use ($excluidos, $titularFijo, $suplenteFijo) {
+            $participantesSorteo = array_filter($participantesConDni, function($item) use ($excluidos, $titularFijo, $suplenteFijo, $barbozaHortensia) {
                 $nombre = explode('|', $item)[0];
                 return !in_array($nombre, $excluidos) && 
                        $item !== $titularFijo && 
-                       $item !== $suplenteFijo;
+                       $item !== $suplenteFijo &&
+                       $item !== $barbozaHortensia;
             });
             
             // Reindexar el array después de las eliminaciones
@@ -338,13 +344,18 @@ $renderBloque = function(array $filas, int $offsetBanca = 0) {
             for ($i = 0; $i < 18; $i++) {
                 $concejal = $autoridades[$i] ?? 'No asignado';
                 
-                // Verificar si es Mazal Malena para asignar posiciones fijas
-               
+                // Verificar si es Mazal Malena o Hector Cardozo para asignar posiciones fijas
                 if ($concejal == 'Mazal Malena') {
-                    // Asignar las personas fijas
-                    
+                    // Asignar las personas fijas para Mazal Malena
                     $titularData = $titularFijo ? explode('|', $titularFijo) : ['Sin asignar'];
                     $suplenteData = $suplenteFijo ? explode('|', $suplenteFijo) : ['Sin asignar'];
+                } elseif ($concejal == 'Hector Cardozo' && $barbozaHortensia) {
+                    // Asignar a BARBOZA MARIA HORTENSIA como titular de Hector Cardozo
+                    $titularData = explode('|', $barbozaHortensia);
+                    
+                    // Buscar un suplente de los participantes restantes
+                    $suplente = array_shift($participantesSorteo);
+                    $suplenteData = $suplente ? explode('|', $suplente) : ['Sin asignar'];
                 } else {
                     // Para las demás bancas, usar el sorteo normal
                     // Reindexar el array después de posibles eliminaciones
