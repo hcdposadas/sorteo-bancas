@@ -6,7 +6,6 @@
  * Time: 11:59
  */
 
-
 ?>
 
 <!doctype html>
@@ -25,467 +24,361 @@
 
     <script src="./dist/bundle.js"></script>
 
+<script>
+// Custom file input - Solución directa
+document.addEventListener('DOMContentLoaded', function() {
+    var fileInputs = document.querySelectorAll('input[type="file"]');
+    fileInputs.forEach(function(input) {
+        input.addEventListener('change', function(e) {
+            var fileName = e.target.files[0].name;
+            var label = input.nextElementSibling;
+            if (label && label.classList.contains('custom-file-label')) {
+                label.textContent = fileName;
+            }
+            
+            // Contar participantes del archivo usando AJAX
+            if (e.target.files.length > 0) {
+                updateCounter('Procesando...', 'text-warning', 'fa-spinner fa-spin', 0);
+                
+                var formData = new FormData();
+                formData.append('archivo', e.target.files[0]);
+                
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'contar.php', true);
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        try {
+                            var response = JSON.parse(xhr.responseText);
+                            
+                            if (response.success) {
+                                updateCounter(
+                                    response.disponibles + ' disponibles', 
+                                    'text-success', 
+                                    'fa-check-circle', 
+                                    response.disponibles
+                                );
+                            } else {
+                                updateCounter(
+                                    response.disponibles + ' disponibles', 
+                                    'text-danger', 
+                                    'fa-exclamation-triangle', 
+                                    response.disponibles
+                                );
+                            }
+                            
+                            // Actualizar mensaje de ayuda
+                            var totalHelp = document.getElementById('totalHelpBlock');
+                            var statusDiv = document.getElementById('total-status');
+                            statusDiv.textContent = response.message;
+                            
+                            if (response.success) {
+                                statusDiv.className = 'font-weight-bold text-success';
+                            } else {
+                                statusDiv.className = 'font-weight-bold text-danger';
+                            }
+                            
+                        } catch (e) {
+                            updateCounter('Error', 'text-danger', 'fa-times-circle', 0);
+                            document.getElementById('total-status').textContent = 'No se pudo procesar el archivo';
+                            document.getElementById('total-status').className = 'font-weight-bold text-danger';
+                        }
+                    } else {
+                        updateCounter('Error', 'text-danger', 'fa-times-circle', 0);
+                        document.getElementById('total-status').textContent = 'Error de conexión';
+                        document.getElementById('total-status').className = 'font-weight-bold text-danger';
+                    }
+                };
+                xhr.onerror = function() {
+                    updateCounter('Error', 'text-danger', 'fa-times-circle', 0);
+                    document.getElementById('total-status').textContent = 'Error de conexión';
+                    document.getElementById('total-status').className = 'font-weight-bold text-danger';
+                };
+                xhr.send(formData);
+            }
+        });
+    });
+    
+    function updateCounter(text, textColor, iconClass, count) {
+        document.getElementById('total').value = text;
+        
+        var icon = document.getElementById('total-icon');
+        icon.innerHTML = '<i class="fa ' + iconClass + ' ' + textColor + '"></i>';
+        
+        // Actualizar barra de progreso
+        var progressBar = document.getElementById('total-progress');
+        var percentage = Math.min((count / 34) * 100, 100);
+        progressBar.style.width = percentage + '%';
+        progressBar.setAttribute('aria-valuenow', percentage);
+        
+        // Cambiar color de la barra según el progreso
+        progressBar.className = 'progress-bar';
+        if (percentage >= 100) {
+            progressBar.classList.add('bg-success');
+        } else if (percentage >= 50) {
+            progressBar.classList.add('bg-info');
+        } else if (percentage >= 25) {
+            progressBar.classList.add('bg-warning');
+        } else {
+            progressBar.classList.add('bg-danger');
+        }
+    }
+});
+</script>
+
     <style>
-        /*borrar despues de usar el ledsote*/
         body{
-            font-size: 1.2rem;
-            font-weight: 900;
+            font-size: 1rem;
+            font-weight: 400;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .main-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin: 2rem auto;
         }
         .text-muted{
-            color: #000 !important;
+            color: #6c757d !important;
+        }
+        .container {
+            max-width: 900px;
+        }
+        .d-block.mx-auto.mb-4 {
+            max-width: 120px;
+            height: auto;
+        }
+        .header-section {
+            text-align: center;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid #f8f9fa;
+            margin-bottom: 2rem;
+        }
+        .form-section {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+        .reference-section {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            border: none;
+            padding: 12px 30px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #0056b3, #004085);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,123,255,0.3);
+        }
+        .form-control {
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            padding: 12px;
+        }
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+        }
+        .custom-file {
+            border-radius: 8px;
+        }
+        .custom-file-input:focus ~ .custom-file-label {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+        }
+        h2 {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .lead {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+        .section-title {
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: #007bff;
+            margin-right: 10px;
         }
     </style>
 
 </head>
 
-<body class="bg-light">
+<body>
 
 <div class="container">
-    <div class="py-5 text-center">
-        <img class="d-block mx-auto mb-4" src="./logo.png" alt="logo">
-        <h2>Sorteo de Bancas</h2>
-        <p class="lead">Para el Parlamento de la Mujer
-        </p>
-        <p>
-            (si desea subir una planilla este es el formato válido )<br>
-            <a href="example.xlsx" class="btn btn-primary">
-                <i class="fa fa-file-excel-o"></i> Descargar Ejemplo</a>
-        </p>
-    </div>
+    <div class="main-container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <img class="d-block mx-auto mb-4" src="./escudo.webp" alt="logo">
+            <h2>Sorteo de Bancas</h2>
+            <p class="lead">Para el Parlamento de la Mujer</p>
+            <p>
+                <small class="text-muted">Formato válido para la planilla de participantes</small><br>
+                <a href="example.xlsx" class="btn btn-outline-primary btn-sm mt-2">
+                    <i class="fa fa-file-excel-o"></i> Descargar Ejemplo
+                </a>
+            </p>
+        </div>
 
-    <div class="row">
-        <div class="col-md-12">
-            <form method="post" name="sorteo" enctype="multipart/form-data">
+        <!-- Form Section -->
+        <div class="form-section">
+            <h3 class="section-title">Configuración del Sorteo</h3>
+            <form method="post" name="sorteo" enctype="multipart/form-data" action="resultados.php">
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-md-6">
                         <div class="form-group">
-                            <label for="archivo">Archivo</label>
+                            <label for="archivo" class="font-weight-bold">
+                                <i class="fa fa-upload"></i> Archivo de Participantes
+                            </label>
                             <div class="custom-file">
                                 <input type="file" name="archivo" class="custom-file-input" id="archivo" lang="es">
                                 <label class="custom-file-label" for="archivo">Seleccionar Archivo</label>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="total">Total</label>
-                            <input required type="number" name="total" class="form-control" id="total"
-                                   aria-describedby="total"
-                                   value="<?php ( isset( $_POST['total'] ) ) ? print $_POST['total'] : print '0' ?>">
-                            <small id="totalHelpBlock" class="form-text text-muted">
-                                Si se sube la planilla este valor será ignorado.
+                            <small class="form-text text-muted">
+                                Formato Excel (.xlsx) o CSV. Mínimo 34 participantes.
                             </small>
                         </div>
                     </div>
-                    <div class="col-6">
+                    <div class="col-md-6">
                         <div class="form-group">
-                            <label for="titulares">Titulares</label>
-                            <input required type="number" name="titulares" class="form-control" id="titulares"
-                                   value="<?php ( isset( $_POST['titulares'] ) ) ? print $_POST['titulares'] : print '14' ?>">
-
+                            <label for="total" class="font-weight-bold">
+                                <i class="fa fa-users"></i> Participantes Disponibles
+                            </label>
+                            <div class="input-group">
+                                <input type="text" name="total" class="form-control" id="total" 
+                                       aria-describedby="total" value="0" readonly>
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="total-icon">
+                                        <i class="fa fa-info-circle text-muted"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div id="totalHelpBlock" class="form-text mt-2">
+                                <div class="d-flex align-items-center">
+                                    <div class="mr-3">
+                                        <small class="text-muted">Estado:</small>
+                                        <div id="total-status" class="font-weight-bold text-muted">Esperando archivo...</div>
+                                    </div>
+                                    <div class="ml-auto">
+                                        <small class="text-muted">Mínimo requerido:</small>
+                                        <div class="badge badge-warning">34 participantes</div>
+                                    </div>
+                                </div>
+                                <div class="progress mt-2" style="height: 8px;">
+                                    <div id="total-progress" class="progress-bar" role="progressbar" 
+                                         style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
                         <div class="form-group">
-                            <label for="suplentes">Suplentes</label>
-                            <input required type="number" name="suplentes" class="form-control" id="suplentes"
-                                   value="<?php ( isset( $_POST['suplentes'] ) ) ? print $_POST['suplentes'] : print '14' ?>">
-
+                            <label for="titulares" class="font-weight-bold">
+                                <i class="fa fa-star"></i> Cantidad de Titulares
+                            </label>
+                            <input type="number" name="titulares" class="form-control" id="titulares"
+                                   value="17" readonly>
+                            <small class="form-text text-muted">Se sortearán 17 titulares</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="suplentes" class="font-weight-bold">
+                                <i class="fa fa-users"></i> Cantidad de Suplentes
+                            </label>
+                            <input type="number" name="suplentes" class="form-control" id="suplentes"
+                                   value="17" readonly>
+                            <small class="form-text text-muted">Se sortearán 17 suplentes</small>
                         </div>
                     </div>
                 </div>
 
-                <button class="btn btn-primary btn-lg btn-block" type="submit">Realizar Sorteo</button>
+                <div class="text-center mt-4">
+                    <button class="btn btn-primary btn-lg" type="submit">
+                        <i class="fa fa-random"></i> Realizar Sorteo
+                    </button>
+                </div>
             </form>
         </div>
-    </div>
 
-
-	<?php
-
-	require 'vendor/autoload.php';
-
-	use PhpOffice\PhpSpreadsheet\Spreadsheet;
-	use PhpOffice\PhpSpreadsheet\Reader\Csv;
-	use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
-
-
-	if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
-	$concejales = [
-		1  => 'Martinez, Horacio',
-		2  => 'Haysler, Marlene',
-		3  => 'Jimenez, Maria Eva',
-		4  => 'Vancsik, Daniel',
-		5  => 'Martinez, Ramon',
-		6  => 'Dachary, Mariela',
-		7  => 'Mazal, Malena',
-		8  => 'Argañaraz, Pablo',
-		9  => 'Koch, Santiago',
-		10 => 'Perie, Florentino',
-		11 => 'Lopez Sartori, Facundo',
-		12 => 'Fonseca, Francisco',
-		13 => 'De Arrechea, Rodrigo',
-		14 => 'Velázquez, Pablo',
-	]
-	?>
-
-    <div class="row mt-1">
-        <div class="col-md-6 mb-6">
-            <h4 class="d-flex justify-content-between align-items-center mb-3">
-                <span class="text-muted">Referencia</span>
-            </h4>
-            <ul class="list-group mb-3">
-                <li class="list-group-item d-flex justify-content-between">
-                    <span>Banca</span>
-                    <strong>Concejal</strong>
-                </li>
-				<?php
-				foreach ( $concejales as $n => $concejal ) {
-
-					if ( $n > 7 ) {
-						break;
-					}
-
-					print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-					print( '<div><h3 class="my-0">#' . $n . '</h3></div>' );
-					print( '<span class="text-muted">' . $concejal . '</span>' );
-
-					print( '</li>' );
-
-					unset( $concejales[ $n ] );
-				}
-				?>
-            </ul>
+        <!-- Reference Section -->
+        <div class="reference-section">
+            <h3 class="section-title">Concejales de Referencia</h3>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th width="10%">#</th>
+                                    <th>Concejal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+								<?php
+								$concejales = [
+									1  => 'VIGO DANIEL',
+									2  => 'TRAID LAURA',
+									3  => 'SCROMEDA LUCIANA',
+									4  => 'ZARZA FERNANDO',
+									5  => 'CARDOZO HÉCTOR',
+									6  => 'MAZAL MALENA',
+									7  => 'MARTINEZ ANGEL',
+									8  => 'GOMEZ DE OLIVEIRA VALERIA',
+									9  => 'SALOM JUDITH',
+									10 => 'SAMIRA ALMIRÓN',
+									11 => 'DIB JAIR',
+									12 => 'FERNANDEZ MARIA ELENA',
+									13 => 'ARGAÑARAZ PABLO',
+									14 => 'HORIANSKI SANTIAGO',
+									15 => 'PAONESA MATIAS (Defensor del Pueblo)',
+									16 => 'PRENDONE MARIELA (Prosecretaria Legislativo)',
+									17 => 'MOHR CAMILO (Prosecretario Administrativo)',
+								];
+								foreach ( $concejales as $n => $concejal ) {
+									echo '<tr>';
+									echo '<td><span class="badge badge-primary">' . $n . '</span></td>';
+									echo '<td>' . $concejal . '</td>';
+									echo '</tr>';
+								}
+								?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-md-6 mb-6">
-            <h4 class="d-flex justify-content-between align-items-center mb-3">
-                <span class="text-muted">Referencia</span>
-            </h4>
-            <ul class="list-group mb-3">
-                <li class="list-group-item d-flex justify-content-between">
-                    <span>Banca</span>
-                    <strong>Concejal</strong>
-                </li>
-				<?php
-				foreach ( $concejales as $n => $concejal ) {
 
-					print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-					print( '<div><h3 class="my-0">#' . $n . '</h3></div>' );
-					print( '<span class="text-muted">' . $concejal . '</span>' );
-
-					print( '</li>' );
-				}
-				?>
-            </ul>
-        </div>
+        <footer class="text-center mt-4 pt-4 border-top">
+            <p class="text-muted small mb-0">
+                &copy; <?php echo date('Y');?> HCD Posadas | Honorable Concejo Deliberante de Posadas
+            </p>
+        </footer>
     </div>
-
-    <div class="row mt-1">
-		<?php
-
-
-		$total            = $_POST['total'];
-		$sheetData        = null;
-		$etiquetaColumna2 = 'Nº Orden';
-
-		$file_mimes = array(
-			'text/x-comma-separated-values',
-			'text/comma-separated-values',
-			'application/octet-stream',
-			'application/vnd.ms-excel',
-			'application/x-csv',
-			'text/x-csv',
-			'text/csv',
-			'application/csv',
-			'application/excel',
-			'application/vnd.msexcel',
-			'text/plain',
-			'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-		);
-
-		if ( isset( $_FILES['archivo']['name'] ) && in_array( $_FILES['archivo']['type'], $file_mimes ) ) {
-
-			$arr_file  = explode( '.', $_FILES['archivo']['name'] );
-			$extension = end( $arr_file );
-
-			if ( 'csv' == $extension ) {
-				$reader = new \PhpOffice\PhpSpreadsheet\Reader\Csv();
-			} else {
-				$reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
-			}
-
-			$spreadsheet = $reader->load( $_FILES['archivo']['tmp_name'] );
-
-			$sheetData = $spreadsheet->getActiveSheet()->toArray();
-
-			unset( $sheetData[0] );
-
-			shuffle( $sheetData );
-
-			$total            = count( $sheetData );
-			$etiquetaColumna2 = 'Nombre, Apellido y DNI';
-//				print_r( $sheetData );
-		}
-
-
-		$titulares = $_POST['titulares'];
-		$suplentes = $_POST['suplentes'];
-
-		$input = range( 1, $total );
-
-		if ( ( $titulares + $suplentes ) <= $total ) {
-
-			// 1 defensoras del pueblo (titular)
-			// 1 secretarias (titular)
-			// 1 prosecretarias legislativas (titular)
-			// 1 prosecretarias administrativas (titular)
-			$cantidadExtra = 4;
-
-			$rand_keys = array_rand( $input, $titulares + $suplentes + $cantidadExtra );
-			$i         = 1;
-
-
-			print( '<div class="col-md-6 mb-6">' );
-			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
-			print( '<span class="text-muted">Titulares</span>' );
-			print( '</h4>' );
-			print( '<ul class="list-group mb-3">' );
-			print( '
-				<li class="list-group-item d-flex justify-content-between">
-                    <span>Posición</span>
-                    <strong>' . $etiquetaColumna2 . '</strong>
-                </li>
-				' );
-
-			foreach ( $rand_keys as $key => $rand_key ) {
-				if ( $i > $titulares ) {
-					break;
-				}
-				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-				print( '<div><h3 class="my-0">#' . $i . '</h3></div>' );
-				if ( $sheetData ) {
-
-					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
-				} else {
-
-					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
-				}
-
-				print( '</li>' );
-
-				unset( $rand_keys[ $key ] );
-
-				$i ++;
-
-			}
-
-
-			print( '</ul>' );
-			print( '</div>' );
-
-//				suplentes
-
-			print( '<div class="col-md-6 mb-6">' );
-			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
-			print( '<span class="text-muted">Suplentes</span>' );
-			print( '</h4>' );
-			print( '<ul class="list-group mb-3">' );
-			print( '
-				<li class="list-group-item d-flex justify-content-between">
-                    <span>Posición</span>
-                    <strong>' . $etiquetaColumna2 . '</strong>
-                </li>
-				' );
-
-			foreach ( $rand_keys as $key => $rand_key ) {
-
-				if ( $i > ( $suplentes + $titulares ) ) {
-					break;
-				}
-
-				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-				print( '<div><h3 class="my-0">#' . $i . '</h3></div>' );
-				if ( $sheetData ) {
-
-					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
-				} else {
-
-					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
-				}
-
-				print( '</li>' );
-
-				unset( $rand_keys[ $key ] );
-
-				$i ++;
-			}
-
-
-			print( '</ul>' );
-			print( '</div>' );
-
-			// Secretaria
-
-			print( '<div class="col-md-6 mb-6">' );
-			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
-			print( '<span class="text-muted">Secretaria</span>' );
-			print( '</h4>' );
-			print( '<ul class="list-group mb-3">' );
-			print( '
-				<li class="list-group-item d-flex justify-content-between">
-                    <span>Posición</span>
-                    <strong>' . $etiquetaColumna2 . '</strong>
-                </li>
-				' );
-
-			foreach ( $rand_keys as $key => $rand_key ) {
-
-				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-				print( '<div><h3 class="my-0">#' . $i . '</h3></div>' );
-				if ( $sheetData ) {
-
-					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
-				} else {
-
-					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
-				}
-
-				print( '</li>' );
-
-				unset( $rand_keys[ $key ] );
-
-				$i ++;
-
-				break;
-			}
-
-
-			print( '</ul>' );
-			print( '</div>' );
-
-			// Defensoras del pueblo
-
-			print( '<div class="col-md-6 mb-6">' );
-			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
-			print( '<span class="text-muted">Defensora del Pueblo</span>' );
-			print( '</h4>' );
-			print( '<ul class="list-group mb-3">' );
-			print( '
-				<li class="list-group-item d-flex justify-content-between">
-                    <span>Posición</span>
-                    <strong>' . $etiquetaColumna2 . '</strong>
-                </li>
-				' );
-
-			foreach ( $rand_keys as $key => $rand_key ) {
-
-				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-				print( '<div><h3 class="my-0">#' . $i . '</h3></div>' );
-				if ( $sheetData ) {
-
-					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
-				} else {
-
-					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
-				}
-
-				print( '</li>' );
-
-				unset( $rand_keys[ $key ] );
-
-				$i ++;
-
-				break;
-			}
-
-
-			print( '</ul>' );
-			print( '</div>' );
-
-			// Prosecretarias
-
-			print( '<div class="col-md-6 mb-6">' );
-			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
-			print( '<span class="text-muted">Pro Secretaria Legislativa</span>' );
-			print( '</h4>' );
-			print( '<ul class="list-group mb-3">' );
-			print( '
-				<li class="list-group-item d-flex justify-content-between">
-                    <span>Posición</span>
-                    <strong>' . $etiquetaColumna2 . '</strong>
-                </li>
-				' );
-
-			foreach ( $rand_keys as $key => $rand_key ) {
-
-				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-				print( '<div><h3 class="my-0">#' . $i . '</h3></div>' );
-				if ( $sheetData ) {
-
-					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
-				} else {
-
-					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
-				}
-
-				print( '</li>' );
-
-				unset( $rand_keys[ $key ] );
-
-				$i ++;
-
-				break;
-			}
-
-
-			print( '</ul>' );
-			print( '</div>' );
-
-			print( '<div class="col-md-6 mb-6">' );
-			print( '<h4 class="d-flex justify-content-between align-items-center mb-3">' );
-			print( '<span class="text-muted">Pro Secretaria Administrativa</span>' );
-			print( '</h4>' );
-			print( '<ul class="list-group mb-3">' );
-			print( '
-				<li class="list-group-item d-flex justify-content-between">
-                    <span>Posición</span>
-                    <strong>' . $etiquetaColumna2 . '</strong>
-                </li>
-				' );
-
-			foreach ( $rand_keys as $key => $rand_key ) {
-
-				print( '<li class="list-group-item d-flex justify-content-between lh-condensed">' );
-				print( '<div><h3 class="my-0">#' . $i . '</h3></div>' );
-				if ( $sheetData ) {
-
-					print( '<span class="text-muted">' . $sheetData[ $rand_key ][0] . ', ' . $sheetData[ $rand_key ][1] . ' - ' . $sheetData[ $rand_key ][2] . '</span>' );
-				} else {
-
-					print( '<span class="text-muted">' . $input[ $rand_key ] . '</span>' );
-				}
-
-				print( '</li>' );
-
-				unset( $rand_keys[ $key ] );
-
-				$i ++;
-
-				break;
-			}
-
-
-			print( '</ul>' );
-			print( '</div>' );
-
-
-		}
-		//			if principal
-
-		}
-		?>
-
-    </div>
-
-    <footer class="my-5 pt-5 text-muted text-center text-small">
-        <p class="mb-1">&copy; <?php print date('Y');?> HCD Posadas</p>
-    </footer>
 </div>
 
 </body>
