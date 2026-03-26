@@ -275,7 +275,7 @@ foreach ($asignaciones as &$a) {
                 <table class="table table-bordered table-hover">
                     <thead>
                         <tr>
-                            <th width="25%">CONCEJAL</th>
+                            <th width="25%">AUTORIDAD</th>
                             <th width="37.5%">TITULAR</th>
                             <th width="37.5%">SUPLENTE</th>
                         </tr>
