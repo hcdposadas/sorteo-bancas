@@ -38,11 +38,11 @@ try {
 
 // ✅ PASO 1 — DEFINIR LA ESTRUCTURA FIJA
 $asignaciones = [
-    ['concejal' => 'CARDOZO HÉCTOR', 'titular' => 'ORTEGA ANTONIA BEATRIZ', 'suplente' => 'MEDINA JUANA'],
+    ['concejal' => 'CARDOZO HÉCTOR', 'titular' => 'ORTEGA ANTONIA BEATRIZ - 22665897', 'suplente' => 'MEDINA JUANA'],
     ['concejal' => 'MAZAL MALENA', 'titular' => 'OCAMPO CAMILA', 'suplente' => 'AVALOS YAMILA'],
-    ['concejal' => 'TRAID LAURA', 'titular' => 'MANDAGARAN MARIEL', 'suplente' => 'LOVERA RAQUEL ISABELA'],
+    ['concejal' => 'TRAID LAURA', 'titular' => 'MANDAGARAN MARIEL - 22582834', 'suplente' => 'LOVERA RAQUEL ISABELA - 20731813'],
     ['concejal' => 'ARGAÑARAZ PABLO', 'titular' => 'GONZALEZ CARLA', 'suplente' => 'POR SORTEO'],
-    ['concejal' => 'GOMEZ DE OLIVEIRA VALERIA', 'titular' => 'FERNÁNDEZ DEBORA', 'suplente' => 'POR SORTEO'],
+    ['concejal' => 'GOMEZ DE OLIVEIRA VALERIA', 'titular' => 'FERNÁNDEZ DEBORA - 34366452', 'suplente' => 'POR SORTEO'],
     ['concejal' => 'HORIANSKI SANTIAGO', 'titular' => 'MELGAREJO DANIELA', 'suplente' => 'POR SORTEO'],
     ['concejal' => 'MOHR CAMILO', 'titular' => 'CASCO BRENDA', 'suplente' => 'POR SORTEO'],
     ['concejal' => 'PRENDONE MARIELA', 'titular' => 'POR SORTEO', 'suplente' => 'POR SORTEO'],
@@ -50,11 +50,12 @@ $asignaciones = [
     ['concejal' => 'SCROMEDA LUCIANA', 'titular' => 'ZIPILIBAN PAULINA', 'suplente' => 'POR SORTEO'],
     ['concejal' => 'DIB JAIR', 'titular' => 'POR SORTEO', 'suplente' => 'POR SORTEO'],
     ['concejal' => 'PAONESA MATIAS', 'titular' => 'POR SORTEO', 'suplente' => 'POR SORTEO'],
-    ['concejal' => 'SALOM JUDITH', 'titular' => 'LATTES CAMILA', 'suplente' => 'BLANCO ROCIO'],
+    ['concejal' => 'SALOM JUDITH', 'titular' => 'LATTES CAMILA - 36058081', 'suplente' => 'BLANCO ROCIO - 37083497'],
     ['concejal' => 'VIGO DANIEL', 'titular' => 'POR SORTEO', 'suplente' => 'POR SORTEO'],
     ['concejal' => 'FERNANDEZ MARIA ELENA', 'titular' => 'CABRERA VANESSA', 'suplente' => 'BENITEZ LAURA'],
     ['concejal' => 'ZARZA FERNANDO', 'titular' => 'POR SORTEO', 'suplente' => 'POR SORTEO'],
-    ['concejal' => 'SAMIRA ALMIRÓN', 'titular' => 'BUCKMAYER LARA MAGALI', 'suplente' => 'VECCHIETTI FRANCESCA'],
+    ['concejal' => 'SAMIRA ALMIRÓN', 'titular' => 'BUCKMAYER LARA MAGALI - 43944957', 'suplente' => 'VECCHIETTI FRANCESCA'],
+    ['concejal' => 'TURKIENICZ GUSTAVO', 'titular' => 'POR SORTEO', 'suplente' => 'POR SORTEO'],
 ];
 
 // ✅ PASO 2 — LEER EL EXCEL BIEN
@@ -87,6 +88,12 @@ $disponibles = array_filter($participantes, function($p) use ($usados) {
 
 $disponibles = array_values($disponibles);
 
+// ✅ PASO 3.5 — CREAR MAPA DE PARTICIPANTES CON DNI
+$participantes_con_dni = [];
+foreach ($participantes as $p) {
+    $participantes_con_dni[strtoupper(trim($p['nombre']))] = $p['dni'];
+}
+
 // ✅ PASO 4 — CONTAR CUÁNTOS "POR SORTEO" NECESITAMOS
 $por_sorteo_necesarios = 0;
 foreach ($asignaciones as $a) {
@@ -99,22 +106,46 @@ if (count($disponibles) < $por_sorteo_necesarios) {
     die("Error: No hay suficientes participantes disponibles. Se necesitan $por_sorteo_necesarios pero solo hay " . count($disponibles) . ".");
 }
 
-// ✅ PASO 6 — HACER EL SORTEO
+// ✅ PASO 6 — HACER EL SORTEO Y ASIGNAR DNI A TODOS
 shuffle($disponibles);
 
 $index = 0;
 foreach ($asignaciones as &$a) {
+    // Procesar TITULAR
     if ($a['titular'] === 'POR SORTEO') {
         if ($index < count($disponibles)) {
-            $a['titular'] = $disponibles[$index]['nombre'];
+            $participante = $disponibles[$index];
+            $nombre_completo = $participante['nombre'];
+            if (!empty($participante['dni'])) {
+                $nombre_completo .= ' - ' . $participante['dni'];
+            }
+            $a['titular'] = $nombre_completo;
             $index++;
+        }
+    } else {
+        // Es un nombre fijo, buscar su DNI
+        $nombre_normalizado = strtoupper(trim($a['titular']));
+        if (isset($participantes_con_dni[$nombre_normalizado]) && !empty($participantes_con_dni[$nombre_normalizado])) {
+            $a['titular'] .= ' - ' . $participantes_con_dni[$nombre_normalizado];
         }
     }
 
+    // ProcesAR SUPLENTE
     if ($a['suplente'] === 'POR SORTEO') {
         if ($index < count($disponibles)) {
-            $a['suplente'] = $disponibles[$index]['nombre'];
+            $participante = $disponibles[$index];
+            $nombre_completo = $participante['nombre'];
+            if (!empty($participante['dni'])) {
+                $nombre_completo .= ' - ' . $participante['dni'];
+            }
+            $a['suplente'] = $nombre_completo;
             $index++;
+        }
+    } else {
+        // Es un nombre fijo, buscar su DNI
+        $nombre_normalizado = strtoupper(trim($a['suplente']));
+        if (isset($participantes_con_dni[$nombre_normalizado]) && !empty($participantes_con_dni[$nombre_normalizado])) {
+            $a['suplente'] .= ' - ' . $participantes_con_dni[$nombre_normalizado];
         }
     }
 }

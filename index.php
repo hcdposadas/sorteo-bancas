@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Actualizar barra de progreso
         var progressBar = document.getElementById('total-progress');
-        var percentage = Math.min((count / 34) * 100, 100);
+        var percentage = Math.min((count / 36) * 100, 100);
         progressBar.style.width = percentage + '%';
         progressBar.setAttribute('aria-valuenow', percentage);
         
@@ -281,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </div>
                                     <div class="ml-auto">
                                         <small class="text-muted">Mínimo requerido:</small>
-                                        <div class="badge badge-warning">34 participantes</div>
+                                        <div class="badge badge-warning">36 participantes</div>
                                     </div>
                                 </div>
                                 <div class="progress mt-2" style="height: 8px;">
@@ -301,8 +301,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <i class="fa fa-star"></i> Cantidad de Titulares
                             </label>
                             <input type="number" name="titulares" class="form-control" id="titulares"
-                                   value="17" readonly>
-                            <small class="form-text text-muted">Se sortearán 17 titulares</small>
+                                   value="18" readonly>
+                            <small class="form-text text-muted">Se sortearán 18 titulares</small>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -311,8 +311,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <i class="fa fa-users"></i> Cantidad de Suplentes
                             </label>
                             <input type="number" name="suplentes" class="form-control" id="suplentes"
-                                   value="17" readonly>
-                            <small class="form-text text-muted">Se sortearán 17 suplentes</small>
+                                   value="18" readonly>
+                            <small class="form-text text-muted">Se sortearán 18 suplentes</small>
                         </div>
                     </div>
                 </div>
@@ -358,6 +358,7 @@ document.addEventListener('DOMContentLoaded', function() {
 									15 => 'PAONESA MATIAS (Defensor del Pueblo)',
 									16 => 'PRENDONE MARIELA (Prosecretaria Legislativo)',
 									17 => 'MOHR CAMILO (Prosecretario Administrativo)',
+									18 => 'TURKIENICZ GUSTAVO (Secretario)',
 								];
 								foreach ( $concejales as $n => $concejal ) {
 									echo '<tr>';

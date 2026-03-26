@@ -10,8 +10,8 @@ use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 
 // Asignaciones fijas del sistema híbrido
 $asignaciones_fijas = [
-    'ORTEGA ANTONIA BEATRIZ', 'MEDINA JUANA', 'OCAMPO CAMILA', 'AVALOS YAMILA',
-    'MANDAGARAN MARIEL', 'LOVERA RAQUEL ISABELA', 'GONZALEZ CARLA', 'FERNÁNDEZ DEBORA',
+    'ORTEGA ANTONIA BEATRIZ - 22665897', 'MEDINA JUANA', 'OCAMPO CAMILA', 'AVALOS YAMILA',
+    'MANDAGARAN MARIEL - 22582834', 'LOVERA RAQUEL ISABELA', 'GONZALEZ CARLA', 'FERNÁNDEZ DEBORA',
     'MELGAREJO DANIELA', 'CASCO BRENDA', 'ZIPILIBAN PAULINA', 'LATTES CAMILA', 'BLANCO ROCIO',
     'CABRERA VANESSA', 'BENITEZ LAURA', 'BUCKMAYER LARA MAGALI', 'VECCHIETTI FRANCESCA'
 ];
@@ -65,7 +65,7 @@ try {
 
     $disponibles_count = count($disponibles);
 
-    if ($disponibles_count >= 34) {
+    if ($disponibles_count >= 36) {
         $response = [
             'success' => true,
             'count' => $total,
@@ -77,7 +77,7 @@ try {
             'success' => false,
             'count' => $total,
             'disponibles' => $disponibles_count,
-            'message' => "Se necesitan mínimo 34 participantes disponibles. Solo hay $disponibles_count."
+            'message' => "Se necesitan mínimo 36 participantes disponibles. Solo hay $disponibles_count."
         ];
     }
 
