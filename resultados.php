@@ -38,11 +38,11 @@ try {
 
 // ✅ PASO 1 — DEFINIR LA ESTRUCTURA FIJA
 $asignaciones = [
-    ['concejal' => 'CARDOZO HÉCTOR', 'titular' => 'ORTEGA ANTONIA BEATRIZ - 22665897', 'suplente' => 'MEDINA JUANA'],
+    ['concejal' => 'CARDOZO HÉCTOR', 'titular' => 'ORTEGA ANTONIA', 'suplente' => 'MEDINA JUANA EVANGELISTA'],
     ['concejal' => 'MAZAL MALENA', 'titular' => 'OCAMPO CAMILA', 'suplente' => 'AVALOS YAMILA'],
-    ['concejal' => 'TRAID LAURA', 'titular' => 'MANDAGARAN MARIEL - 22582834', 'suplente' => 'LOVERA RAQUEL ISABELA - 20731813'],
+    ['concejal' => 'TRAID LAURA', 'titular' => 'MANDAGARAN ROSA MARIEL', 'suplente' => 'LOVERA RAQUELA ISABEL'],
     ['concejal' => 'ARGAÑARAZ PABLO', 'titular' => 'GONZALEZ CARLA', 'suplente' => 'POR SORTEO'],
-    ['concejal' => 'GOMEZ DE OLIVEIRA VALERIA', 'titular' => 'FERNÁNDEZ DEBORA - 34366452', 'suplente' => 'POR SORTEO'],
+    ['concejal' => 'GOMEZ DE OLIVEIRA VALERIA', 'titular' => 'FERNÁNDEZ DÉBORA LIS', 'suplente' => 'POR SORTEO'],
     ['concejal' => 'HORIANSKI SANTIAGO', 'titular' => 'MELGAREJO DANIELA', 'suplente' => 'POR SORTEO'],
     ['concejal' => 'MOHR CAMILO', 'titular' => 'CASCO BRENDA', 'suplente' => 'POR SORTEO'],
     ['concejal' => 'PRENDONE MARIELA', 'titular' => 'POR SORTEO', 'suplente' => 'POR SORTEO'],
@@ -50,11 +50,11 @@ $asignaciones = [
     ['concejal' => 'SCROMEDA LUCIANA', 'titular' => 'ZIPILIBAN PAULINA', 'suplente' => 'POR SORTEO'],
     ['concejal' => 'DIB JAIR', 'titular' => 'POR SORTEO', 'suplente' => 'POR SORTEO'],
     ['concejal' => 'PAONESA MATIAS', 'titular' => 'POR SORTEO', 'suplente' => 'POR SORTEO'],
-    ['concejal' => 'SALOM JUDITH', 'titular' => 'LATTES CAMILA - 36058081', 'suplente' => 'BLANCO ROCIO - 37083497'],
+    ['concejal' => 'SALOM JUDITH', 'titular' => 'LATTES CAMILA INES', 'suplente' => 'BLANCO ROCÍO'],
     ['concejal' => 'VIGO DANIEL', 'titular' => 'POR SORTEO', 'suplente' => 'POR SORTEO'],
     ['concejal' => 'FERNANDEZ MARIA ELENA', 'titular' => 'CABRERA VANESSA', 'suplente' => 'BENITEZ LAURA'],
     ['concejal' => 'ZARZA FERNANDO', 'titular' => 'POR SORTEO', 'suplente' => 'POR SORTEO'],
-    ['concejal' => 'SAMIRA ALMIRÓN', 'titular' => 'BUCKMAYER LARA MAGALI - 43944957', 'suplente' => 'VECCHIETTI FRANCESCA'],
+    ['concejal' => 'SAMIRA ALMIRÓN', 'titular' => 'BUCKMAYER LARA', 'suplente' => 'VECCHIETTI FRANCESCA'],
     ['concejal' => 'TURKIENICZ GUSTAVO', 'titular' => 'POR SORTEO', 'suplente' => 'POR SORTEO'],
 ];
 
