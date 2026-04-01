@@ -38,6 +38,7 @@ try {
 
 // ✅ PASO 1 — DEFINIR LA ESTRUCTURA FIJA
 $asignaciones = [
+<<<<<<< Updated upstream
     ['concejal' => 'CARDOZO HÉCTOR', 'titular' => 'ORTEGA ANTONIA', 'suplente' => 'MEDINA JUANA EVANGELISTA'],
     ['concejal' => 'MAZAL MALENA', 'titular' => 'OCAMPO CAMILA', 'suplente' => 'AVALOS YAMILA'],
     ['concejal' => 'TRAID LAURA', 'titular' => 'MANDAGARAN ROSA MARIEL', 'suplente' => 'LOVERA RAQUELA ISABEL'],
@@ -56,6 +57,27 @@ $asignaciones = [
     ['concejal' => 'ZARZA FERNANDO', 'titular' => 'POR SORTEO', 'suplente' => 'POR SORTEO'],
     ['concejal' => 'SAMIRA ALMIRÓN', 'titular' => 'BUCKMAYER LARA', 'suplente' => 'VECCHIETTI FRANCESCA'],
     ['concejal' => 'TURKIENICZ GUSTAVO', 'titular' => 'POR SORTEO', 'suplente' => 'POR SORTEO'],
+=======
+    ['concejal' => 'CARDOZO HÉCTOR', 'titular' => 'ORTEGA ANTONIA - 22665897', 'suplente' => 'MEDINA JUANA'],
+    ['concejal' => 'MAZAL MALENA', 'titular' => 'OCAMPO CAMILA', 'suplente' => 'AVALOS YAMILA'],
+    ['concejal' => 'TRAID LAURA', 'titular' => 'MANDAGARAN MARIEL - 22582834', 'suplente' => 'LOVERA RAQUEL ISABELA - 20731813'],
+    ['concejal' => 'ARGAÑARAZ PABLO', 'titular' => 'GONZALEZ CARLA', 'suplente' => 'SORIA MIRTA CLARA - 11915021'],
+    ['concejal' => 'GOMEZ DE OLIVEIRA VALERIA', 'titular' => 'FERNÁNDEZ DEBORA - 34366452', 'suplente' => 'GENESINI SANDRA - 34824003'],
+    ['concejal' => 'HORIANSKI SANTIAGO', 'titular' => 'MELGAREJO DANIELA', 'suplente' => 'YZA CINTIA - 31911666'],
+    ['concejal' => 'MOHR CAMILO', 'titular' => 'CASCO BRENDA', 'suplente' => 'GALARZA ROSANA MAGALÍ - 37158949'],
+    ['concejal' => 'PRENDONE MARIELA', 'titular' => 'JMILOVKI ANA MARÍA - 17064059', 'suplente' => 'ROJAS VERONICA - 30145967'],
+    ['concejal' => 'MARTINEZ ANGEL', 'titular' => 'MACEIRA JORGELINA NOEMI - 24210020', 'suplente' => 'CORDOBE SOFIA - 42715950'],
+    ['concejal' => 'SCROMEDA LUCIANA', 'titular' => 'ZIPILIBAN PAULINA', 'suplente' => 'QUINTANA MARIA ESTHER - 13897779'],
+    ['concejal' => 'DIB JAIR', 'titular' => 'BROUSSE ANTONELLA - 37325005', 'suplente' => '-'],
+    ['concejal' => 'PAONESA MATIAS', 'titular' => 'PIPAN ANGELA ALEJANDRA - 18295485', 'suplente' => 'PINTOS SOFIA - 26610394'],
+    ['concejal' => 'SALOM JUDITH', 'titular' => 'LATTES CAMILA - 36058081', 'suplente' => 'BLANCO ROCIO - 37083497'],
+    ['concejal' => 'VIGO DANIEL', 'titular' => 'DAVALOS SOL CAMILA - 40534763', 'suplente' => 'CHIODIN RAYEN BEATRIZ - 34897111'],
+    ['concejal' => 'FERNANDEZ MARIA ELENA', 'titular' => 'CABRERA VANESSA', 'suplente' => 'BENITEZ LAURA'],
+    ['concejal' => 'ZARZA FERNANDO', 'titular' => 'NUÑEZ MARISA ELIZABETH - 28094619', 'suplente' => 'MENDEZ PATRICIA - 32417957'],
+    ['concejal' => 'SAMIRA ALMIRÓN', 'titular' => 'BUCKMAYER LARA - 43944957', 'suplente' => 'VECCHIETTI FRANCESCA'],
+    ['concejal' => 'TURKIENICZ GUSTAVO', 'titular' => 'PERIE CAROLINA SUSAN - 17039831', 'suplente' => 'CENTENO IVANA ANDREA -
+33012017'],
+>>>>>>> Stashed changes
 ];
 
 // ✅ PASO 2 — LEER EL EXCEL BIEN

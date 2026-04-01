@@ -260,37 +260,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="total" class="font-weight-bold">
-                                <i class="fa fa-users"></i> Participantes Disponibles
-                            </label>
-                            <div class="input-group">
-                                <input type="text" name="total" class="form-control" id="total" 
-                                       aria-describedby="total" value="0" readonly>
-                                <div class="input-group-append">
-                                    <span class="input-group-text" id="total-icon">
-                                        <i class="fa fa-info-circle text-muted"></i>
-                                    </span>
-                                </div>
-                            </div>
-                            <div id="totalHelpBlock" class="form-text mt-2">
-                                <div class="d-flex align-items-center">
-                                    <div class="mr-3">
-                                        <small class="text-muted">Estado:</small>
-                                        <div id="total-status" class="font-weight-bold text-muted">Esperando archivo...</div>
-                                    </div>
-                                    <div class="ml-auto">
-                                        <small class="text-muted">Mínimo requerido:</small>
-                                        <div class="badge badge-warning">36 participantes</div>
-                                    </div>
-                                </div>
-                                <div class="progress mt-2" style="height: 8px;">
-                                    <div id="total-progress" class="progress-bar" role="progressbar" 
-                                         style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Contador oculto -->
+                        <input type="hidden" name="total" id="total" value="0">
                     </div>
                 </div>
                 
