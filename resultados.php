@@ -38,26 +38,6 @@ try {
 
 // ✅ PASO 1 — DEFINIR LA ESTRUCTURA FIJA
 $asignaciones = [
-<<<<<<< Updated upstream
-    ['concejal' => 'CARDOZO HÉCTOR', 'titular' => 'ORTEGA ANTONIA', 'suplente' => 'MEDINA JUANA EVANGELISTA'],
-    ['concejal' => 'MAZAL MALENA', 'titular' => 'OCAMPO CAMILA', 'suplente' => 'AVALOS YAMILA'],
-    ['concejal' => 'TRAID LAURA', 'titular' => 'MANDAGARAN ROSA MARIEL', 'suplente' => 'LOVERA RAQUELA ISABEL'],
-    ['concejal' => 'ARGAÑARAZ PABLO', 'titular' => 'GONZALEZ CARLA', 'suplente' => 'POR SORTEO'],
-    ['concejal' => 'GOMEZ DE OLIVEIRA VALERIA', 'titular' => 'FERNÁNDEZ DÉBORA LIS', 'suplente' => 'POR SORTEO'],
-    ['concejal' => 'HORIANSKI SANTIAGO', 'titular' => 'MELGAREJO DANIELA', 'suplente' => 'POR SORTEO'],
-    ['concejal' => 'MOHR CAMILO', 'titular' => 'CASCO BRENDA', 'suplente' => 'POR SORTEO'],
-    ['concejal' => 'PRENDONE MARIELA', 'titular' => 'POR SORTEO', 'suplente' => 'POR SORTEO'],
-    ['concejal' => 'MARTINEZ ANGEL', 'titular' => 'POR SORTEO', 'suplente' => 'POR SORTEO'],
-    ['concejal' => 'SCROMEDA LUCIANA', 'titular' => 'ZIPILIBAN PAULINA', 'suplente' => 'POR SORTEO'],
-    ['concejal' => 'DIB JAIR', 'titular' => 'POR SORTEO', 'suplente' => 'POR SORTEO'],
-    ['concejal' => 'PAONESA MATIAS', 'titular' => 'POR SORTEO', 'suplente' => 'POR SORTEO'],
-    ['concejal' => 'SALOM JUDITH', 'titular' => 'LATTES CAMILA INES', 'suplente' => 'BLANCO ROCÍO'],
-    ['concejal' => 'VIGO DANIEL', 'titular' => 'POR SORTEO', 'suplente' => 'POR SORTEO'],
-    ['concejal' => 'FERNANDEZ MARIA ELENA', 'titular' => 'CABRERA VANESSA', 'suplente' => 'BENITEZ LAURA'],
-    ['concejal' => 'ZARZA FERNANDO', 'titular' => 'POR SORTEO', 'suplente' => 'POR SORTEO'],
-    ['concejal' => 'SAMIRA ALMIRÓN', 'titular' => 'BUCKMAYER LARA', 'suplente' => 'VECCHIETTI FRANCESCA'],
-    ['concejal' => 'TURKIENICZ GUSTAVO', 'titular' => 'POR SORTEO', 'suplente' => 'POR SORTEO'],
-=======
     ['concejal' => 'CARDOZO HÉCTOR', 'titular' => 'ORTEGA ANTONIA - 22665897', 'suplente' => 'MEDINA JUANA'],
     ['concejal' => 'MAZAL MALENA', 'titular' => 'OCAMPO CAMILA', 'suplente' => 'AVALOS YAMILA'],
     ['concejal' => 'TRAID LAURA', 'titular' => 'MANDAGARAN MARIEL - 22582834', 'suplente' => 'LOVERA RAQUEL ISABELA - 20731813'],
@@ -68,16 +48,14 @@ $asignaciones = [
     ['concejal' => 'PRENDONE MARIELA', 'titular' => 'JMILOVKI ANA MARÍA - 17064059', 'suplente' => 'ROJAS VERONICA - 30145967'],
     ['concejal' => 'MARTINEZ ANGEL', 'titular' => 'MACEIRA JORGELINA NOEMI - 24210020', 'suplente' => 'CORDOBE SOFIA - 42715950'],
     ['concejal' => 'SCROMEDA LUCIANA', 'titular' => 'ZIPILIBAN PAULINA', 'suplente' => 'QUINTANA MARIA ESTHER - 13897779'],
-    ['concejal' => 'DIB JAIR', 'titular' => 'BROUSSE ANTONELLA - 37325005', 'suplente' => '-'],
+    ['concejal' => 'DIB JAIR', 'titular' => 'BROUSSE ANTONELLA - 37325005', 'suplente' => 'POR SORTEO'],
     ['concejal' => 'PAONESA MATIAS', 'titular' => 'PIPAN ANGELA ALEJANDRA - 18295485', 'suplente' => 'PINTOS SOFIA - 26610394'],
     ['concejal' => 'SALOM JUDITH', 'titular' => 'LATTES CAMILA - 36058081', 'suplente' => 'BLANCO ROCIO - 37083497'],
     ['concejal' => 'VIGO DANIEL', 'titular' => 'DAVALOS SOL CAMILA - 40534763', 'suplente' => 'CHIODIN RAYEN BEATRIZ - 34897111'],
     ['concejal' => 'FERNANDEZ MARIA ELENA', 'titular' => 'CABRERA VANESSA', 'suplente' => 'BENITEZ LAURA'],
     ['concejal' => 'ZARZA FERNANDO', 'titular' => 'NUÑEZ MARISA ELIZABETH - 28094619', 'suplente' => 'MENDEZ PATRICIA - 32417957'],
     ['concejal' => 'SAMIRA ALMIRÓN', 'titular' => 'BUCKMAYER LARA - 43944957', 'suplente' => 'VECCHIETTI FRANCESCA'],
-    ['concejal' => 'TURKIENICZ GUSTAVO', 'titular' => 'PERIE CAROLINA SUSAN - 17039831', 'suplente' => 'CENTENO IVANA ANDREA -
-33012017'],
->>>>>>> Stashed changes
+    ['concejal' => 'TURKIENICZ GUSTAVO', 'titular' => 'PERIE CAROLINA SUSAN - 17039831', 'suplente' => 'CENTENO IVANA ANDREA - 33012017'],
 ];
 
 // ✅ PASO 2 — LEER EL EXCEL BIEN
@@ -179,125 +157,311 @@ foreach ($asignaciones as &$a) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Resultados del Sorteo de Bancas">
+    <meta name="description" content="Resultados del Sorteo de Bancas - Honorable Concejo Deliberante de Posadas">
     <meta name="author" content="HCD Posadas">
     <link rel="icon" href="favicon.png">
-    <title>Resultados del Sorteo de Bancas</title>
+    <title>Resultados del Sorteo de Bancas - HCD Posadas</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="./dist/bundle.js"></script>
+    
     <style>
-        body{
-            font-size: 1rem;
-            font-weight: 400;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        :root {
+            --primary-color: #1e40af;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #64748b;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             min-height: 100vh;
+            font-weight: 400;
         }
-        .main-container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            padding: 2rem;
-            margin: 2rem auto;
-        }
+        
         .container {
             max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
         }
-        .d-block.mx-auto.mb-4 {
-            max-width: 120px;
-            height: auto;
-        }
-        .header-section {
+        
+        /* Header */
+        .header {
             text-align: center;
-            padding-bottom: 2rem;
-            border-bottom: 2px solid #f8f9fa;
-            margin-bottom: 2rem;
+            padding: 3rem 0 2rem;
         }
-        .table {
+        
+        .header-logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 1.5rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            object-fit: contain;
             background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 0.5rem;
         }
-        .table th {
-            background: linear-gradient(45deg, #007bff, #0056b3);
-            color: white;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            letter-spacing: 0.5px;
-            border: none;
+        
+        .header-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.025em;
         }
-        .table td {
-            vertical-align: middle;
-            font-weight: 500;
+        
+        .header-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            font-weight: 400;
         }
-        .table tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-        .stats-section {
-            background: #f8f9fa;
-            padding: 1.5rem;
-            border-radius: 10px;
+        
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 2rem;
             margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            transition: box-shadow 0.2s ease;
         }
-        .badge-success {
-            background: #28a745;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
+        
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .card-title i {
+            color: var(--primary-color);
+            font-size: 1.125rem;
+        }
+        
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+        
+        .table th {
+            background: var(--bg-color);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+        
+        .table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+            vertical-align: middle;
+        }
+        
+        .table tbody tr:hover {
+            background: var(--bg-color);
+        }
+        
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .table td:first-child {
             font-weight: 600;
         }
-        .badge-info {
-            background: #17a2b8;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-        .btn-primary {
-            background: linear-gradient(45deg, #007bff, #0056b3);
+        
+        /* Button */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
             border: none;
-            padding: 12px 30px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
         }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+        
         .btn-primary:hover {
-            background: linear-gradient(45deg, #0056b3, #004085);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,123,255,0.3);
+            background: var(--primary-hover);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
         }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .btn-secondary:hover {
+            background: #475569;
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+        
+        /* Actions */
+        .actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 2rem 0 1.5rem;
+            }
+            
+            .header-title {
+                font-size: 1.5rem;
+            }
+            
+            .card {
+                padding: 1.5rem;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+        
+        /* Print Styles */
         @media print {
             .no-print {
                 display: none !important;
             }
+            
             body {
                 background: white;
             }
-            .main-container {
+            
+            .card {
                 box-shadow: none;
-                margin: 0;
-                padding: 1rem;
+                border: 1px solid #ccc;
+                margin-bottom: 1rem;
+            }
+            
+            .header {
+                padding: 1rem 0;
+            }
+            
+            .header-logo {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .header-title {
+                font-size: 1.5rem;
+            }
+            
+            .table {
+                font-size: 0.75rem;
+            }
+            
+            .table th,
+            .table td {
+                padding: 0.5rem;
             }
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="main-container">
-        <!-- Header Section -->
-        <div class="header-section">
-            <img class="d-block mx-auto mb-4" src="./escudo.webp" alt="logo">
-            <h2>Resultados del Sorteo de Bancas</h2>
-            <p class="lead">Parlamento de la Mujer - <?php echo date('d/m/Y'); ?></p>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <img src="./escudo.webp" alt="HCD Posadas" class="header-logo">
+            <h1 class="header-title">Resultados del Sorteo de Bancas</h1>
+            <p class="header-subtitle">Parlamento de la Mujer - <?php echo date('d/m/Y'); ?></p>
         </div>
+    </header>
 
-        <!-- Results Table -->
-        <div class="row mb-4">
-            <div class="col-md-12">
-                <table class="table table-bordered table-hover">
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Results Card -->
+        <div class="card">
+            <h2 class="card-title">
+                <i class="fas fa-trophy"></i>
+                Resultados del Sorteo
+            </h2>
+            
+            <div class="table-container">
+                <table class="table">
                     <thead>
                         <tr>
-                            <th width="25%">AUTORIDAD</th>
+                            <th width="25%">CONCEJAL</th>
                             <th width="37.5%">TITULAR</th>
                             <th width="37.5%">SUPLENTE</th>
                         </tr>
@@ -305,7 +469,7 @@ foreach ($asignaciones as &$a) {
                     <tbody>
                         <?php foreach ($asignaciones as $asignacion): ?>
                         <tr>
-                            <td><strong><?php echo $asignacion['concejal']; ?></strong></td>
+                            <td><?php echo $asignacion['concejal']; ?></td>
                             <td><?php echo $asignacion['titular']; ?></td>
                             <td><?php echo $asignacion['suplente']; ?></td>
                         </tr>
@@ -315,22 +479,24 @@ foreach ($asignaciones as &$a) {
             </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="text-center no-print">
-            <button onclick="window.print()" class="btn btn-primary mr-2">
-                <i class="fa fa-print"></i> Imprimir
+        <!-- Actions -->
+        <div class="actions no-print">
+            <button onclick="window.print()" class="btn btn-primary">
+                <i class="fas fa-print"></i>
+                Imprimir
             </button>
             <a href="index.php" class="btn btn-secondary">
-                <i class="fa fa-arrow-left"></i> Volver
+                <i class="fas fa-arrow-left"></i>
+                Volver
             </a>
         </div>
+    </main>
 
-        <footer class="text-center mt-4 pt-4 border-top no-print">
-            <p class="text-muted small mb-0">
-                &copy; <?php echo date('Y');?> HCD Posadas | Honorable Concejo Deliberante de Posadas
-            </p>
-        </footer>
-    </div>
-</div>
+    <!-- Footer -->
+    <footer class="footer no-print">
+        <div class="container">
+            <p>&copy; <?php echo date('Y'); ?> Honorable Concejo Deliberante de Posadas | Todos los derechos reservados</p>
+        </div>
+    </footer>
 </body>
 </html>
