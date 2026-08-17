@@ -36,6 +36,9 @@ foreach ($participantes as $p) {
 $stats = ppc_estadisticas($participantes);
 check($stats['por_tipo'] === [2 => 11, 3 => 8, 4 => 41], 'distribución por tipo inesperada: ' . json_encode($stats['por_tipo']));
 
+$nombres = array_map(fn($p) => $p['nombre'] . ' ' . $p['apellido'], $participantes);
+check(count(array_unique($nombres)) === count($nombres), 'padrón de ejemplo: hay nombre+apellido repetidos');
+
 // --- Invariantes sobre N sorteos -------------------------------------------
 $N = (int)($argv[1] ?? 300);
 $ordenesPrimeros = [];
