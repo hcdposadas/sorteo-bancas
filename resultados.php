@@ -277,6 +277,14 @@ function nombre_completo(array $p): string
         .badge-tipo-2 { background: rgb(30 64 175 / 0.1); color: var(--primary-color); }
         .badge-tipo-3 { background: rgb(5 150 105 / 0.1); color: var(--success-color); }
         .badge-tipo-4 { background: rgb(217 119 6 / 0.1); color: var(--warning-color); }
+        .badge-escuela { background: rgb(147 51 234 / 0.1); color: #9333ea; }
+
+        .tipo-nombre {
+            display: block;
+            margin-top: 0.25rem;
+            font-size: 0.6875rem;
+            color: var(--text-secondary);
+        }
 
         .badge-titular { background: rgb(5 150 105 / 0.1); color: var(--success-color); }
         .badge-cotitular { background: rgb(30 64 175 / 0.1); color: var(--primary-color); }
@@ -424,6 +432,10 @@ function nombre_completo(array $p): string
                     <div class="stat-label">Personas habilitadas</div>
                 </div>
                 <div class="stat-tile">
+                    <div class="stat-number"><?php echo count(PPC_ESCUELAS); ?></div>
+                    <div class="stat-label">Bancas de escuelas</div>
+                </div>
+                <div class="stat-tile">
                     <div class="stat-number">11</div>
                     <div class="stat-label">Titulares</div>
                 </div>
@@ -459,29 +471,48 @@ function nombre_completo(array $p): string
         </div>
         <?php endif; ?>
 
-        <!-- Bancas por tipo -->
-        <?php foreach ($resultado['bancas'] as $tipo => $banca): ?>
+        <!-- Bancas del Parlamento (lista única) -->
         <div class="card">
             <h2 class="card-title">
                 <i class="fas fa-chair"></i>
-                Banca Tipo <?php echo $tipo; ?> — <?php echo e($banca['nombre']); ?>
+                Bancas del Parlamento
             </h2>
 
             <div class="table-container">
                 <table class="table">
                     <thead>
                         <tr>
+                            <th>Tipo de banca</th>
                             <th>Concejal que cede su banca</th>
                             <th>Rol</th>
-                            <th>Nombre y Apellido</th>
-                            <th>DNI</th>
+                            <th>Nombre y Apellido / Institución</th>
+                            <th>DNI / CUE</th>
                             <th>Género</th>
                             <th>N° de prelación</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($banca['asignaciones'] as $a): ?>
+                        <?php foreach (PPC_ESCUELAS as $esc): ?>
                         <tr>
+                            <td><span class="badge badge-escuela">Escuelas</span></td>
+                            <td class="concejal-cell"><?php echo e($esc['concejal']); ?></td>
+                            <td><span class="badge badge-titular">Titular</span></td>
+                            <td>
+                                <?php echo e($esc['institucion']); ?>
+                                <span class="tipo-nombre">Gestión <?php echo e($esc['gestion']); ?> · <?php echo e($esc['delegacion']); ?></span>
+                            </td>
+                            <td><?php echo e($esc['cue']); ?></td>
+                            <td>—</td>
+                            <td>—</td>
+                        </tr>
+                        <?php endforeach; ?>
+                        <?php foreach ($resultado['bancas'] as $tipo => $banca): ?>
+                            <?php foreach ($banca['asignaciones'] as $a): ?>
+                        <tr>
+                            <td rowspan="2">
+                                <span class="badge badge-tipo-<?php echo $tipo; ?>">Tipo <?php echo $tipo; ?></span>
+                                <span class="tipo-nombre"><?php echo e($banca['nombre']); ?></span>
+                            </td>
                             <td class="concejal-cell" rowspan="2"><?php echo e($a['concejal']); ?></td>
                             <td><span class="badge badge-titular">Titular</span></td>
                             <td>
@@ -506,12 +537,17 @@ function nombre_completo(array $p): string
                             <td><?php echo $generos[$a['cotitular']['genero']]; ?></td>
                             <td><?php echo $a['cotitular']['orden']; ?></td>
                         </tr>
+                            <?php endforeach; ?>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
+
+            <p style="margin-top: 1rem; font-size: 0.8125rem; color: var(--text-secondary);">
+                Las bancas de escuelas corresponden al sorteo de escuelas PPC realizado el 28/07/2026.
+                Las restantes surgen del presente sorteo general.
+            </p>
         </div>
-        <?php endforeach; ?>
 
         <!-- Orden de suplencia -->
         <div class="card">

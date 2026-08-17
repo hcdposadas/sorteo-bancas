@@ -331,6 +331,7 @@
         .badge-tipo-2 { background: rgb(30 64 175 / 0.1); color: var(--primary-color); }
         .badge-tipo-3 { background: rgb(5 150 105 / 0.1); color: var(--success-color); }
         .badge-tipo-4 { background: rgb(217 119 6 / 0.1); color: var(--warning-color); }
+        .badge-escuela { background: rgb(147 51 234 / 0.1); color: #9333ea; }
 
         /* Footer */
         .footer {
@@ -446,6 +447,11 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <tr>
+                            <td><span class="badge badge-escuela">Escuelas</span> Instituciones educativas</td>
+                            <td><?php echo count(PPC_ESCUELAS); ?> bancas (ya sorteadas el 28/07/2026)</td>
+                            <td><?php echo htmlspecialchars(implode(', ', array_column(PPC_ESCUELAS, 'concejal'))); ?></td>
+                        </tr>
                         <?php foreach (PPC_TIPOS as $tipo => $cfg): ?>
                         <tr>
                             <td><span class="badge badge-tipo-<?php echo $tipo; ?>">Tipo <?php echo $tipo; ?></span> <?php echo htmlspecialchars($cfg['nombre']); ?></td>

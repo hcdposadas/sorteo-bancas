@@ -40,6 +40,14 @@ const PPC_TIPOS = [
 
 const PPC_TOTAL_BANCAS = 22;
 
+/** Bancas de escuelas ya asignadas en el sorteo de escuelas PPC (28/07/2026). */
+const PPC_ESCUELAS = [
+    ['institucion' => 'BOP102', 'cue' => '540150900', 'gestion' => 'Pública', 'delegacion' => 'Itaembé Guazú', 'concejal' => 'MAZAL MALENA'],
+    ['institucion' => 'Instituto Proyección 2000', 'cue' => '540046600', 'gestion' => 'Privada', 'delegacion' => 'Itaembé Miné Este', 'concejal' => 'GOMEZ DE OLIVEIRA VALERIA'],
+    ['institucion' => 'Instituto Posadas 0403', 'cue' => '540073800', 'gestion' => 'Privada', 'delegacion' => 'Villa Urquiza', 'concejal' => 'SAMIRA ALMIRÓN'],
+    ['institucion' => 'BOP 9', 'cue' => '540104500', 'gestion' => 'Pública', 'delegacion' => 'Sede central', 'concejal' => 'CARDOZO HÉCTOR'],
+];
+
 /**
  * Convierte las filas crudas de la planilla (sin encabezado) en participantes.
  * Columnas esperadas: Nombre | Apellido | DNI | Género (V/M/O) | Tipo de banca (2/3/4).
