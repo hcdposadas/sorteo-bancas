@@ -1,9 +1,10 @@
 <?php
 /**
- * Página de resultados del sorteo - Sistema Híbrido
+ * Resultados del Sorteo General PPC.
  */
 
 require 'vendor/autoload.php';
+require 'sorteo_ppc.php';
 
 use PhpOffice\PhpSpreadsheet\Reader\Csv;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
@@ -30,144 +31,46 @@ if ($extension === 'csv') {
 try {
     $spreadsheet = $reader->load($_FILES['archivo']['tmp_name']);
     $sheetData = $spreadsheet->getActiveSheet()->toArray();
-    unset($sheetData[0]);
-    $sheetData = array_values($sheetData);
+    unset($sheetData[0]); // encabezado
 } catch (\Throwable $e) {
     die('Error leyendo archivo: ' . $e->getMessage());
 }
 
-// ✅ PASO 1 — DEFINIR LA ESTRUCTURA FIJA
-$asignaciones = [
-    ['concejal' => 'CARDOZO HÉCTOR', 'titular' => 'ORTEGA ANTONIA - 22665897', 'suplente' => 'MEDINA JUANA'],
-    ['concejal' => 'MAZAL MALENA', 'titular' => 'OCAMPO CAMILA', 'suplente' => 'AVALOS YAMILA'],
-    ['concejal' => 'TRAID LAURA', 'titular' => 'MANDAGARAN MARIEL - 22582834', 'suplente' => 'LOVERA RAQUEL ISABELA - 20731813'],
-    ['concejal' => 'ARGAÑARAZ PABLO', 'titular' => 'GONZALEZ CARLA', 'suplente' => 'SORIA MIRTA CLARA - 11915021'],
-    ['concejal' => 'GOMEZ DE OLIVEIRA VALERIA', 'titular' => 'FERNÁNDEZ DEBORA - 34366452', 'suplente' => 'GENESINI SANDRA - 34824003'],
-    ['concejal' => 'HORIANSKI SANTIAGO', 'titular' => 'MELGAREJO DANIELA', 'suplente' => 'YZA CINTIA - 31911666'],
-    ['concejal' => 'MOHR CAMILO', 'titular' => 'CASCO BRENDA', 'suplente' => 'GALARZA ROSANA MAGALÍ - 37158949'],
-    ['concejal' => 'PRENDONE MARIELA', 'titular' => 'JMILOVKI ANA MARÍA - 17064059', 'suplente' => 'ROJAS VERONICA - 30145967'],
-    ['concejal' => 'MARTINEZ ANGEL', 'titular' => 'MACEIRA JORGELINA NOEMI - 24210020', 'suplente' => 'CORDOBE SOFIA - 42715950'],
-    ['concejal' => 'SCROMEDA LUCIANA', 'titular' => 'ZIPILIBAN PAULINA', 'suplente' => 'QUINTANA MARIA ESTHER - 13897779'],
-    ['concejal' => 'DIB JAIR', 'titular' => 'BROUSSE ANTONELLA - 37325005', 'suplente' => 'POR SORTEO'],
-    ['concejal' => 'PAONESA MATIAS', 'titular' => 'PIPAN ANGELA ALEJANDRA - 18295485', 'suplente' => 'PINTOS SOFIA - 26610394'],
-    ['concejal' => 'SALOM JUDITH', 'titular' => 'LATTES CAMILA - 36058081', 'suplente' => 'BLANCO ROCIO - 37083497'],
-    ['concejal' => 'VIGO DANIEL', 'titular' => 'DAVALOS SOL CAMILA - 40534763', 'suplente' => 'CHIODIN RAYEN BEATRIZ - 34897111'],
-    ['concejal' => 'FERNANDEZ MARIA ELENA', 'titular' => 'CABRERA VANESSA', 'suplente' => 'BENITEZ LAURA'],
-    ['concejal' => 'ZARZA FERNANDO', 'titular' => 'NUÑEZ MARISA ELIZABETH - 28094619', 'suplente' => 'MENDEZ PATRICIA - 32417957'],
-    ['concejal' => 'SAMIRA ALMIRÓN', 'titular' => 'BUCKMAYER LARA - 43944957', 'suplente' => 'VECCHIETTI FRANCESCA'],
-    ['concejal' => 'TURKIENICZ GUSTAVO', 'titular' => 'PERIE CAROLINA SUSAN - 17039831', 'suplente' => 'CENTENO IVANA ANDREA - 33012017'],
-];
+$parsed = ppc_parse_padron(array_values($sheetData));
 
-// ✅ PASO 2 — LEER EL EXCEL BIEN
-$participantes = [];
-
-foreach ($sheetData as $row) {
-    if (!empty($row[0]) && !empty($row[1])) {
-        $participantes[] = [
-            'nombre' => trim($row[0] . ' ' . $row[1]),
-            'dni' => $row[2] ?? ''
-        ];
-    }
+try {
+    $resultado = ppc_sortear($parsed['participantes']);
+} catch (\Throwable $e) {
+    die('Error en el sorteo: ' . $e->getMessage());
 }
 
-// ✅ PASO 3 — ELIMINAR LOS YA USADOS
-$usados = [];
+$fechaSorteo = date('d/m/Y H:i:s');
+$generos = ['M' => 'Mujer', 'V' => 'Varón', 'O' => 'Otro'];
 
-foreach ($asignaciones as $a) {
-    if ($a['titular'] !== 'POR SORTEO') {
-        $usados[] = strtoupper(trim($a['titular']));
-    }
-    if ($a['suplente'] !== 'POR SORTEO') {
-        $usados[] = strtoupper(trim($a['suplente']));
-    }
+function e(string $s): string
+{
+    return htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
 }
 
-$disponibles = array_filter($participantes, function($p) use ($usados) {
-    return !in_array(strtoupper($p['nombre']), $usados);
-});
-
-$disponibles = array_values($disponibles);
-
-// ✅ PASO 3.5 — CREAR MAPA DE PARTICIPANTES CON DNI
-$participantes_con_dni = [];
-foreach ($participantes as $p) {
-    $participantes_con_dni[strtoupper(trim($p['nombre']))] = $p['dni'];
+function nombre_completo(array $p): string
+{
+    return e($p['nombre'] . ' ' . $p['apellido']);
 }
-
-// ✅ PASO 4 — CONTAR CUÁNTOS "POR SORTEO" NECESITAMOS
-$por_sorteo_necesarios = 0;
-foreach ($asignaciones as $a) {
-    if ($a['titular'] === 'POR SORTEO') $por_sorteo_necesarios++;
-    if ($a['suplente'] === 'POR SORTEO') $por_sorteo_necesarios++;
-}
-
-// ✅ PASO 5 — VALIDAR CANTIDAD SUFICIENTE
-if (count($disponibles) < $por_sorteo_necesarios) {
-    die("Error: No hay suficientes participantes disponibles. Se necesitan $por_sorteo_necesarios pero solo hay " . count($disponibles) . ".");
-}
-
-// ✅ PASO 6 — HACER EL SORTEO Y ASIGNAR DNI A TODOS
-shuffle($disponibles);
-
-$index = 0;
-foreach ($asignaciones as &$a) {
-    // Procesar TITULAR
-    if ($a['titular'] === 'POR SORTEO') {
-        if ($index < count($disponibles)) {
-            $participante = $disponibles[$index];
-            $nombre_completo = $participante['nombre'];
-            if (!empty($participante['dni'])) {
-                $nombre_completo .= ' - ' . $participante['dni'];
-            }
-            $a['titular'] = $nombre_completo;
-            $index++;
-        }
-    } else {
-        // Es un nombre fijo, buscar su DNI
-        $nombre_normalizado = strtoupper(trim($a['titular']));
-        if (isset($participantes_con_dni[$nombre_normalizado]) && !empty($participantes_con_dni[$nombre_normalizado])) {
-            $a['titular'] .= ' - ' . $participantes_con_dni[$nombre_normalizado];
-        }
-    }
-
-    // ProcesAR SUPLENTE
-    if ($a['suplente'] === 'POR SORTEO') {
-        if ($index < count($disponibles)) {
-            $participante = $disponibles[$index];
-            $nombre_completo = $participante['nombre'];
-            if (!empty($participante['dni'])) {
-                $nombre_completo .= ' - ' . $participante['dni'];
-            }
-            $a['suplente'] = $nombre_completo;
-            $index++;
-        }
-    } else {
-        // Es un nombre fijo, buscar su DNI
-        $nombre_normalizado = strtoupper(trim($a['suplente']));
-        if (isset($participantes_con_dni[$nombre_normalizado]) && !empty($participantes_con_dni[$nombre_normalizado])) {
-            $a['suplente'] .= ' - ' . $participantes_con_dni[$nombre_normalizado];
-        }
-    }
-}
-
-// ✅ PASO 7 — MOSTRAR EXACTAMENTE COMO LA IMAGEN
 ?>
 <!doctype html>
 <html lang="es">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Resultados del Sorteo de Bancas - Honorable Concejo Deliberante de Posadas">
+    <meta name="description" content="Resultados del Sorteo General PPC - Honorable Concejo Deliberante de Posadas">
     <meta name="author" content="HCD Posadas">
     <link rel="icon" href="favicon.png">
-    <title>Resultados del Sorteo de Bancas - HCD Posadas</title>
-    
+    <title>Resultados del Sorteo General PPC - HCD Posadas</title>
+
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script src="./dist/bundle.js"></script>
-    
+
     <style>
         :root {
             --primary-color: #1e40af;
@@ -188,13 +91,13 @@ foreach ($asignaciones as &$a) {
             --radius-md: 0.5rem;
             --radius-lg: 0.75rem;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             font-size: 0.875rem;
@@ -204,19 +107,19 @@ foreach ($asignaciones as &$a) {
             min-height: 100vh;
             font-weight: 400;
         }
-        
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 1rem;
         }
-        
+
         /* Header */
         .header {
             text-align: center;
             padding: 3rem 0 2rem;
         }
-        
+
         .header-logo {
             width: 120px;
             height: 120px;
@@ -227,7 +130,7 @@ foreach ($asignaciones as &$a) {
             background: white;
             padding: 0.5rem;
         }
-        
+
         .header-title {
             font-size: 2rem;
             font-weight: 700;
@@ -235,13 +138,13 @@ foreach ($asignaciones as &$a) {
             margin-bottom: 0.5rem;
             letter-spacing: -0.025em;
         }
-        
+
         .header-subtitle {
             font-size: 1.125rem;
             color: var(--text-secondary);
             font-weight: 400;
         }
-        
+
         /* Cards */
         .card {
             background: var(--card-bg);
@@ -250,13 +153,8 @@ foreach ($asignaciones as &$a) {
             padding: 2rem;
             margin-bottom: 2rem;
             border: 1px solid var(--border-color);
-            transition: box-shadow 0.2s ease;
         }
-        
-        .card:hover {
-            box-shadow: var(--shadow-lg);
-        }
-        
+
         .card-title {
             font-size: 1.25rem;
             font-weight: 600;
@@ -266,25 +164,79 @@ foreach ($asignaciones as &$a) {
             align-items: center;
             gap: 0.75rem;
         }
-        
+
         .card-title i {
             color: var(--primary-color);
             font-size: 1.125rem;
         }
-        
+
+        /* Stats tiles */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-tile {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.25rem 1rem;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .metodo {
+            margin-top: 1.25rem;
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+        }
+
+        .metodo i {
+            color: var(--success-color);
+        }
+
+        /* Alerts */
+        .alert {
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.8125rem;
+        }
+
+        .alert-warning {
+            background: rgb(217 119 6 / 0.08);
+            border: 1px solid rgb(217 119 6 / 0.3);
+            color: var(--warning-color);
+        }
+
+        .alert ul {
+            margin: 0.5rem 0 0 1.25rem;
+        }
+
         /* Table */
         .table-container {
             overflow-x: auto;
             border-radius: var(--radius-lg);
             border: 1px solid var(--border-color);
         }
-        
+
         .table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.875rem;
         }
-        
+
         .table th {
             background: var(--bg-color);
             padding: 1rem;
@@ -294,26 +246,42 @@ foreach ($asignaciones as &$a) {
             border-bottom: 1px solid var(--border-color);
             white-space: nowrap;
         }
-        
+
         .table td {
             padding: 0.75rem 1rem;
             border-bottom: 1px solid var(--border-color);
             color: var(--text-primary);
             vertical-align: middle;
         }
-        
-        .table tbody tr:hover {
-            background: var(--bg-color);
-        }
-        
+
         .table tbody tr:last-child td {
             border-bottom: none;
         }
-        
-        .table td:first-child {
+
+        .concejal-cell {
             font-weight: 600;
         }
-        
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: var(--bg-color);
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        .badge-tipo-2 { background: rgb(30 64 175 / 0.1); color: var(--primary-color); }
+        .badge-tipo-3 { background: rgb(5 150 105 / 0.1); color: var(--success-color); }
+        .badge-tipo-4 { background: rgb(217 119 6 / 0.1); color: var(--warning-color); }
+
+        .badge-titular { background: rgb(5 150 105 / 0.1); color: var(--success-color); }
+        .badge-cotitular { background: rgb(30 64 175 / 0.1); color: var(--primary-color); }
+        .badge-vacante { background: rgb(220 38 38 / 0.1); color: var(--danger-color); }
+
         /* Button */
         .btn {
             display: inline-flex;
@@ -330,35 +298,31 @@ foreach ($asignaciones as &$a) {
             transition: all 0.2s ease;
             font-family: inherit;
         }
-        
+
         .btn-primary {
             background: var(--primary-color);
             color: white;
             box-shadow: var(--shadow-sm);
         }
-        
+
         .btn-primary:hover {
             background: var(--primary-hover);
             box-shadow: var(--shadow-md);
             transform: translateY(-1px);
         }
-        
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-        
+
         .btn-secondary {
             background: var(--secondary-color);
             color: white;
             box-shadow: var(--shadow-sm);
         }
-        
+
         .btn-secondary:hover {
             background: #475569;
             box-shadow: var(--shadow-md);
             transform: translateY(-1px);
         }
-        
+
         /* Footer */
         .footer {
             text-align: center;
@@ -366,71 +330,73 @@ foreach ($asignaciones as &$a) {
             color: var(--text-secondary);
             font-size: 0.75rem;
         }
-        
+
         /* Actions */
         .actions {
             display: flex;
             gap: 1rem;
             justify-content: center;
             flex-wrap: wrap;
+            margin-bottom: 2rem;
         }
-        
+
         /* Responsive */
         @media (max-width: 768px) {
             .header {
                 padding: 2rem 0 1.5rem;
             }
-            
+
             .header-title {
                 font-size: 1.5rem;
             }
-            
+
             .card {
                 padding: 1.5rem;
             }
-            
+
             .actions {
                 flex-direction: column;
             }
-            
+
             .btn {
                 width: 100%;
             }
         }
-        
+
         /* Print Styles */
         @media print {
             .no-print {
                 display: none !important;
             }
-            
+
             body {
                 background: white;
             }
-            
+
             .card {
                 box-shadow: none;
                 border: 1px solid #ccc;
                 margin-bottom: 1rem;
+                break-inside: avoid;
             }
-            
+
             .header {
                 padding: 1rem 0;
             }
-            
+
             .header-logo {
                 width: 60px;
                 height: 60px;
             }
-            
+
             .header-title {
                 font-size: 1.5rem;
             }
-            
+
             .table {
                 font-size: 0.75rem;
             }
-            
+
             .table th,
             .table td {
                 padding: 0.5rem;
@@ -443,40 +409,148 @@ foreach ($asignaciones as &$a) {
     <header class="header">
         <div class="container">
             <img src="./escudo.webp" alt="HCD Posadas" class="header-logo">
-            <h1 class="header-title">Resultados del Sorteo de Bancas</h1>
-            <p class="header-subtitle">Parlamento de la Mujer - <?php echo date('d/m/Y'); ?></p>
+            <h1 class="header-title">Resultados del Sorteo General PPC</h1>
+            <p class="header-subtitle">Honorable Concejo Deliberante de Posadas</p>
         </div>
     </header>
 
     <!-- Main Content -->
     <main class="container">
-        <!-- Results Card -->
+        <!-- Stats Card -->
+        <div class="card">
+            <div class="stats-grid">
+                <div class="stat-tile">
+                    <div class="stat-number"><?php echo $resultado['stats']['total']; ?></div>
+                    <div class="stat-label">Personas habilitadas</div>
+                </div>
+                <div class="stat-tile">
+                    <div class="stat-number">11</div>
+                    <div class="stat-label">Titulares</div>
+                </div>
+                <div class="stat-tile">
+                    <div class="stat-number">11</div>
+                    <div class="stat-label">Cotitulares</div>
+                </div>
+                <div class="stat-tile">
+                    <div class="stat-number"><?php echo count($resultado['suplentes']); ?></div>
+                    <div class="stat-label">Orden de suplencia</div>
+                </div>
+                <div class="stat-tile">
+                    <div class="stat-number" style="font-size: 1rem; line-height: 2.4rem;"><?php echo $fechaSorteo; ?></div>
+                    <div class="stat-label">Fecha del sorteo</div>
+                </div>
+            </div>
+            <p class="metodo">
+                <i class="fas fa-check-circle"></i>
+                Sorteo realizado mediante orden general de prelación aleatorio, con cupos por tipo de banca
+                y equilibrio de género entre mujeres y varones en titulares y cotitulares (el género O ocupa cupo de varones).
+            </p>
+        </div>
+
+        <?php if (!empty($resultado['notas'])): ?>
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-circle"></i>
+            Cupos cubiertos por orden general de prelación:
+            <ul>
+                <?php foreach ($resultado['notas'] as $nota): ?>
+                <li><?php echo e($nota); ?></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+        <?php endif; ?>
+
+        <!-- Bancas por tipo -->
+        <?php foreach ($resultado['bancas'] as $tipo => $banca): ?>
         <div class="card">
             <h2 class="card-title">
-                <i class="fas fa-trophy"></i>
-                Resultados del Sorteo
+                <i class="fas fa-chair"></i>
+                Banca Tipo <?php echo $tipo; ?> — <?php echo e($banca['nombre']); ?>
             </h2>
-            
+
             <div class="table-container">
                 <table class="table">
                     <thead>
                         <tr>
-                            <th width="25%">CONCEJAL</th>
-                            <th width="37.5%">TITULAR</th>
-                            <th width="37.5%">SUPLENTE</th>
+                            <th>Concejal que cede su banca</th>
+                            <th>Rol</th>
+                            <th>Nombre y Apellido</th>
+                            <th>DNI</th>
+                            <th>Género</th>
+                            <th>N° de prelación</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($asignaciones as $asignacion): ?>
+                        <?php foreach ($banca['asignaciones'] as $a): ?>
                         <tr>
-                            <td><?php echo $asignacion['concejal']; ?></td>
-                            <td><?php echo $asignacion['titular']; ?></td>
-                            <td><?php echo $asignacion['suplente']; ?></td>
+                            <td class="concejal-cell" rowspan="2"><?php echo e($a['concejal']); ?></td>
+                            <td><span class="badge badge-titular">Titular</span></td>
+                            <td>
+                                <?php echo nombre_completo($a['titular']); ?>
+                                <?php if ($a['titular']['cubre_vacante']): ?>
+                                    <span class="badge badge-vacante">cubre vacante (tipo <?php echo $a['titular']['tipo']; ?>)</span>
+                                <?php endif; ?>
+                            </td>
+                            <td><?php echo e($a['titular']['dni']); ?></td>
+                            <td><?php echo $generos[$a['titular']['genero']]; ?></td>
+                            <td><?php echo $a['titular']['orden']; ?></td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-cotitular">Cotitular</span></td>
+                            <td>
+                                <?php echo nombre_completo($a['cotitular']); ?>
+                                <?php if ($a['cotitular']['cubre_vacante']): ?>
+                                    <span class="badge badge-vacante">cubre vacante (tipo <?php echo $a['cotitular']['tipo']; ?>)</span>
+                                <?php endif; ?>
+                            </td>
+                            <td><?php echo e($a['cotitular']['dni']); ?></td>
+                            <td><?php echo $generos[$a['cotitular']['genero']]; ?></td>
+                            <td><?php echo $a['cotitular']['orden']; ?></td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
+        </div>
+        <?php endforeach; ?>
+
+        <!-- Orden de suplencia -->
+        <div class="card">
+            <h2 class="card-title">
+                <i class="fas fa-list-ol"></i>
+                Orden de Suplencia
+            </h2>
+
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>N°</th>
+                            <th>Nombre y Apellido</th>
+                            <th>DNI</th>
+                            <th>Tipo de banca</th>
+                            <th>Género</th>
+                            <th>N° de prelación</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($resultado['suplentes'] as $i => $s): ?>
+                        <tr>
+                            <td style="font-weight: 600;"><?php echo $i + 1; ?></td>
+                            <td><?php echo nombre_completo($s); ?></td>
+                            <td><?php echo e($s['dni']); ?></td>
+                            <td><span class="badge badge-tipo-<?php echo $s['tipo']; ?>">Tipo <?php echo $s['tipo']; ?> — <?php echo e(PPC_TIPOS[$s['tipo']]['nombre']); ?></span></td>
+                            <td><?php echo $generos[$s['genero']]; ?></td>
+                            <td><?php echo $s['orden']; ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <p style="margin-top: 1rem; font-size: 0.8125rem; color: var(--text-secondary);">
+                Las suplencias cubren eventuales renuncias, vacancias o imposibilidades de participación,
+                respetando el orden general de prelación resultante del sorteo.
+            </p>
         </div>
 
         <!-- Actions -->
