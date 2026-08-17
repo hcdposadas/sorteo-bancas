@@ -45,7 +45,6 @@ try {
 }
 
 $fechaSorteo = date('d/m/Y H:i:s');
-$generos = ['M' => 'Mujer', 'V' => 'Varón', 'O' => 'Otro'];
 
 function e(string $s): string
 {
@@ -487,8 +486,6 @@ function nombre_completo(array $p): string
                             <th>Rol</th>
                             <th>Nombre y Apellido / Institución</th>
                             <th>DNI / CUE</th>
-                            <th>Género</th>
-                            <th>N° de prelación</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -502,8 +499,6 @@ function nombre_completo(array $p): string
                                 <span class="tipo-nombre">Gestión <?php echo e($esc['gestion']); ?> · <?php echo e($esc['delegacion']); ?></span>
                             </td>
                             <td><?php echo e($esc['cue']); ?></td>
-                            <td>—</td>
-                            <td>—</td>
                         </tr>
                         <?php endforeach; ?>
                         <?php foreach ($resultado['bancas'] as $tipo => $banca): ?>
@@ -522,8 +517,6 @@ function nombre_completo(array $p): string
                                 <?php endif; ?>
                             </td>
                             <td><?php echo e($a['titular']['dni']); ?></td>
-                            <td><?php echo $generos[$a['titular']['genero']]; ?></td>
-                            <td><?php echo $a['titular']['orden']; ?></td>
                         </tr>
                         <tr>
                             <td><span class="badge badge-cotitular">Cotitular</span></td>
@@ -534,8 +527,6 @@ function nombre_completo(array $p): string
                                 <?php endif; ?>
                             </td>
                             <td><?php echo e($a['cotitular']['dni']); ?></td>
-                            <td><?php echo $generos[$a['cotitular']['genero']]; ?></td>
-                            <td><?php echo $a['cotitular']['orden']; ?></td>
                         </tr>
                             <?php endforeach; ?>
                         <?php endforeach; ?>
@@ -564,8 +555,6 @@ function nombre_completo(array $p): string
                             <th>Nombre y Apellido</th>
                             <th>DNI</th>
                             <th>Tipo de banca</th>
-                            <th>Género</th>
-                            <th>N° de prelación</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -575,8 +564,6 @@ function nombre_completo(array $p): string
                             <td><?php echo nombre_completo($s); ?></td>
                             <td><?php echo e($s['dni']); ?></td>
                             <td><span class="badge badge-tipo-<?php echo $s['tipo']; ?>">Tipo <?php echo $s['tipo']; ?> — <?php echo e(PPC_TIPOS[$s['tipo']]['nombre']); ?></span></td>
-                            <td><?php echo $generos[$s['genero']]; ?></td>
-                            <td><?php echo $s['orden']; ?></td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
