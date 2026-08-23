@@ -44,7 +44,7 @@ try {
     die('Error en el sorteo: ' . $e->getMessage());
 }
 
-$fechaSorteo = date('d/m/Y H:i:s');
+$fechaSorteo = date('d/m/Y');
 
 function e(string $s): string
 {
@@ -431,10 +431,6 @@ function nombre_completo(array $p): string
                     <div class="stat-label">Personas habilitadas</div>
                 </div>
                 <div class="stat-tile">
-                    <div class="stat-number"><?php echo count(PPC_ESCUELAS); ?></div>
-                    <div class="stat-label">Bancas de escuelas</div>
-                </div>
-                <div class="stat-tile">
                     <div class="stat-number">11</div>
                     <div class="stat-label">Titulares</div>
                 </div>
@@ -447,7 +443,7 @@ function nombre_completo(array $p): string
                     <div class="stat-label">Orden de suplencia</div>
                 </div>
                 <div class="stat-tile">
-                    <div class="stat-number" style="font-size: 1rem; line-height: 2.4rem;"><?php echo $fechaSorteo; ?></div>
+                    <div class="stat-number" style="font-size: 1.25rem; line-height: 2.4rem;"><?php echo $fechaSorteo; ?></div>
                     <div class="stat-label">Fecha del sorteo</div>
                 </div>
             </div>
