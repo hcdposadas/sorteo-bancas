@@ -465,8 +465,7 @@
 
             <p style="margin-top: 1rem; font-size: 0.8125rem; color: var(--text-secondary);">
                 <i class="fas fa-info-circle" style="color: var(--primary-color);"></i>
-                Se sortean 22 personas (11 titulares y 11 cotitulares) mediante un orden general de prelación aleatorio,
-                con equilibrio de género entre mujeres y varones en cada grupo (el género O ocupa cupo de varones).
+                Se sortean 22 personas (11 titulares y 11 cotitulares) mediante un orden general de prelación aleatorio.
                 Las personas no seleccionadas integran el orden de suplencia.
             </p>
         </div>

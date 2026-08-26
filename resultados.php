@@ -450,7 +450,7 @@ function nombre_completo(array $p): string
             <p class="metodo">
                 <i class="fas fa-check-circle"></i>
                 Sorteo realizado mediante orden general de prelación aleatorio, con cupos por tipo de banca
-                y equilibrio de género entre mujeres y varones en titulares y cotitulares (el género O ocupa cupo de varones).
+                y equilibrio de género entre mujeres y varones en titulares y cotitulares.
             </p>
         </div>
 
@@ -502,7 +502,6 @@ function nombre_completo(array $p): string
                         <tr>
                             <td rowspan="2">
                                 <span class="badge badge-tipo-<?php echo $tipo; ?>">Tipo <?php echo $tipo; ?></span>
-                                <span class="tipo-nombre"><?php echo e($banca['nombre']); ?></span>
                             </td>
                             <td class="concejal-cell" rowspan="2"><?php echo e($a['concejal']); ?></td>
                             <td><span class="badge badge-titular">Titular</span></td>
