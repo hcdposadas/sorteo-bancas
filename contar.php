@@ -39,6 +39,7 @@ try {
         'total'        => $stats['total'],
         'por_tipo'     => $stats['por_tipo'],
         'por_genero'   => $stats['por_genero'],
+        'por_prioridad' => $stats['por_prioridad'],
         'advertencias' => $parsed['advertencias'],
         'message'      => $ok
             ? "Padrón válido: {$stats['total']} personas habilitadas"

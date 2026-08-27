@@ -35,6 +35,7 @@ foreach ($participantes as $p) {
 
 $stats = ppc_estadisticas($participantes);
 check($stats['por_tipo'] === [2 => 11, 3 => 8, 4 => 41], 'distribución por tipo inesperada: ' . json_encode($stats['por_tipo']));
+check($stats['por_prioridad'] === [1 => 44, 2 => 16], 'distribución por prioridad inesperada: ' . json_encode($stats['por_prioridad']));
 
 $nombres = array_map(fn($p) => $p['nombre'] . ' ' . $p['apellido'], $participantes);
 check(count(array_unique($nombres)) === count($nombres), 'padrón de ejemplo: hay nombre+apellido repetidos');
@@ -66,6 +67,20 @@ for ($run = 0; $run < $N; $run++) {
     $ordenes = array_column($r['orden_general'], 'orden');
     sort($ordenes);
     check($ordenes === range(1, 60), "run $run: orden general no es 1..60");
+    // Bloques de prioridad: ninguna prioridad 2 puede preceder a una prioridad 1
+    $prioridades = array_column($r['orden_general'], 'prioridad');
+    $prioridadesOrdenadas = $prioridades;
+    sort($prioridadesOrdenadas);
+    check($prioridades === $prioridadesOrdenadas, "run $run: el orden general no respeta los bloques de prioridad");
+
+    // Con este padrón solo entran los 2 de prioridad 2 que los cupos fuerzan:
+    // tipo 3 usa su pool completo y tipo 2 necesita su 4° varón.
+    $sel2 = array_filter($r['seleccionados'], fn($p) => $p['prioridad'] === 2);
+    check(count($sel2) === 2, "run $run: entraron " . count($sel2) . " de prioridad 2, se esperaban 2");
+    foreach ($sel2 as $p) {
+        check(in_array($p['banca_tipo'], [2, 3], true), "run $run: prioridad 2 en banca tipo {$p['banca_tipo']}");
+    }
+
     $ordSup = array_column($r['suplentes'], 'orden');
     $ordSorted = $ordSup;
     sort($ordSorted);
@@ -127,9 +142,9 @@ for ($run = 0; $run < $N; $run++) {
 check(count(array_unique($ordenesPrimeros)) > 5, 'aleatoriedad: el primer puesto casi no varía entre corridas');
 
 // --- Casos borde sintéticos -------------------------------------------------
-function persona(string $n, int $i, string $g, int $t): array
+function persona(string $n, int $i, string $g, int $t, int $pr = 1): array
 {
-    return ['nombre' => $n, 'apellido' => "Ap$i", 'dni' => (string)(90000000 + $i), 'genero' => $g, 'tipo' => $t];
+    return ['nombre' => $n, 'apellido' => "Ap$i", 'dni' => (string)(90000000 + $i), 'genero' => $g, 'prioridad' => $pr, 'tipo' => $t];
 }
 
 // a) Insuficiencia en tipo 2: solo 5 inscriptos tipo 2 → 3 vacantes por orden general
@@ -156,6 +171,34 @@ for ($k = 0; $k < 11; $k++) $sint[] = persona('M3', $i++, 'M', 3);
 for ($k = 0; $k < 11; $k++) $sint[] = persona('M4', $i++, 'M', 4);
 $r = ppc_sortear($sint);
 check(count($r['seleccionados']) === 22, 'sintético b: no completó los cupos con un solo género');
+
+// d) Con cupos holgados y ambos géneros en prioridad 1, no entra ningún prioridad 2
+$sint = [];
+$i = 0;
+foreach ([2, 3, 4] as $tipo) {
+    for ($k = 0; $k < 20; $k++) {
+        $sint[] = persona("T$tipo", $i++, $k % 2 ? 'M' : 'V', $tipo, $k < 10 ? 1 : 2);
+    }
+}
+$r = ppc_sortear($sint);
+foreach ($r['seleccionados'] as $p) {
+    check($p['prioridad'] === 1, 'sintético d: entró prioridad 2 habiendo prioridad 1 disponible');
+}
+check(count(array_filter($r['suplentes'], fn($p) => $p['prioridad'] === 2)) === 30, 'sintético d: suplencia sin los 30 de prioridad 2');
+
+// e) La prioridad no desplaza al equilibrio de género: si la prioridad 1 de un
+//    tipo es de un solo género, el cupo igual se completa con prioridad 2.
+$sint = [];
+$i = 0;
+for ($k = 0; $k < 8; $k++) $sint[] = persona('T2p1', $i++, 'M', 2, 1);
+for ($k = 0; $k < 8; $k++) $sint[] = persona('T2p2', $i++, 'V', 2, 2);
+for ($k = 0; $k < 20; $k++) $sint[] = persona('T3', $i++, $k % 2 ? 'M' : 'V', 3, 1);
+for ($k = 0; $k < 20; $k++) $sint[] = persona('T4', $i++, $k % 2 ? 'M' : 'V', 4, 1);
+$r = ppc_sortear($sint);
+$t2 = array_filter($r['seleccionados'], fn($p) => $p['banca_tipo'] === 2);
+$clasesT2 = array_count_values(array_map('ppc_clase', $t2));
+check(($clasesT2['M'] ?? 0) === 4 && ($clasesT2['V'] ?? 0) === 4, 'sintético e: tipo 2 sin 4M+4V, el género cedió ante la prioridad');
+check(count(array_filter($t2, fn($p) => $p['prioridad'] === 2)) === 4, 'sintético e: los varones de prioridad 2 no cubrieron el cupo de género');
 
 // c) Menos de 22 personas → excepción
 try {

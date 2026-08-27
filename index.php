@@ -389,7 +389,7 @@
                             <i class="fas fa-cloud-upload-alt"></i>
                         </div>
                         <div class="file-upload-text">Seleccionar archivo</div>
-                        <div class="file-upload-subtext">Excel (.xlsx) o CSV — columnas: Nombre, Apellido, DNI, Género (V/M/O), Tipo de banca (2/3/4)</div>
+                        <div class="file-upload-subtext">Excel (.xlsx) o CSV — columnas: Nombre, Apellido, DNI, Género (V/M/O), Prioridad (1/2), Tipo de banca (2/3/4)</div>
                     </div>
                 </div>
 
@@ -415,6 +415,10 @@
                         <div class="stat-tile">
                             <div class="stat-number" id="statGenero" style="font-size: 1.125rem; line-height: 2.4rem;">-</div>
                             <div class="stat-label">Mujeres / Varones / Otro</div>
+                        </div>
+                        <div class="stat-tile">
+                            <div class="stat-number" id="statPrioridad" style="font-size: 1.125rem; line-height: 2.4rem;">-</div>
+                            <div class="stat-label">Prioridad 1 / Prioridad 2</div>
                         </div>
                     </div>
                     <div id="mensajePadron"></div>
@@ -465,7 +469,8 @@
 
             <p style="margin-top: 1rem; font-size: 0.8125rem; color: var(--text-secondary);">
                 <i class="fas fa-info-circle" style="color: var(--primary-color);"></i>
-                Se sortean 22 personas (11 titulares y 11 cotitulares) mediante un orden general de prelación aleatorio.
+                Se sortean 22 personas (11 titulares y 11 cotitulares) mediante un orden general de prelación aleatorio,
+                sorteado primero entre quienes no participaron antes (prioridad 1) y después entre quienes ya participaron (prioridad 2).
                 Las personas no seleccionadas integran el orden de suplencia.
             </p>
         </div>
@@ -518,6 +523,10 @@
                     if (response.por_genero) {
                         document.getElementById('statGenero').textContent =
                             (response.por_genero.M || 0) + ' / ' + (response.por_genero.V || 0) + ' / ' + (response.por_genero.O || 0);
+                    }
+                    if (response.por_prioridad) {
+                        document.getElementById('statPrioridad').textContent =
+                            (response.por_prioridad[1] || 0) + ' / ' + (response.por_prioridad[2] || 0);
                     }
 
                     var html = '';

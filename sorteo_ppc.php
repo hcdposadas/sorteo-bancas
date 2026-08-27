@@ -7,9 +7,13 @@
  *  - Banca tipo 2 (personas con discapacidad): 4 titulares y 4 cotitulares.
  *  - Banca tipo 3 (personas mayores):          4 titulares y 4 cotitulares.
  *  - Banca tipo 4 (participación general):     3 titulares y 3 cotitulares.
- *  - Orden general de prelación aleatorio único para todo el padrón.
+ *  - Orden general de prelación aleatorio, sorteado en bloques de prioridad:
+ *    primero todas las personas de prioridad 1 (no participaron antes) y
+ *    después las de prioridad 2 (ya participaron).
  *  - Equilibrio de género M/V en titulares y en cotitulares de cada tipo,
  *    siempre que el padrón lo permita. El género O ocupa cupo de varones.
+ *    El equilibrio de género es tope duro: la prioridad ordena a los
+ *    candidatos dentro de cada cupo, no desplaza al equilibrio.
  *  - Cupos que no se puedan completar se cubren por orden general de prelación,
  *    priorizando el género necesario para preservar el equilibrio.
  *  - Las personas no seleccionadas integran el orden de suplencia según el
@@ -40,6 +44,9 @@ const PPC_TIPOS = [
 
 const PPC_TOTAL_BANCAS = 22;
 
+/** Prioridades válidas, de mayor a menor: 1 = no participó antes, 2 = ya participó. */
+const PPC_PRIORIDADES = [1, 2];
+
 /** Bancas de escuelas ya asignadas en el sorteo de escuelas PPC (28/07/2026). */
 const PPC_ESCUELAS = [
     ['institucion' => 'BOP102', 'cue' => '540150900', 'gestion' => 'Pública', 'delegacion' => 'Itaembé Guazú', 'concejal' => 'MAZAL MALENA'],
@@ -50,7 +57,8 @@ const PPC_ESCUELAS = [
 
 /**
  * Convierte las filas crudas de la planilla (sin encabezado) en participantes.
- * Columnas esperadas: Nombre | Apellido | DNI | Género (V/M/O) | Tipo de banca (2/3/4).
+ * Columnas esperadas: Nombre | Apellido | DNI | Género (V/M/O) |
+ * Prioridad (1/2) | Tipo de banca (2/3/4).
  *
  * @return array{participantes: array, advertencias: string[]}
  */
@@ -83,18 +91,26 @@ function ppc_parse_padron(array $sheetData): array
             continue;
         }
 
-        $tipo = (int)round((float)($row[4] ?? 0));
+        $prioridadCruda = trim((string)($row[4] ?? ''));
+        $prioridad = (int)round((float)$prioridadCruda);
+        if (!in_array($prioridad, PPC_PRIORIDADES, true)) {
+            $advertencias[] = "Fila $fila ($nombre $apellido): prioridad inválida «" . $prioridadCruda . "», se omitió.";
+            continue;
+        }
+
+        $tipo = (int)round((float)($row[5] ?? 0));
         if (!isset(PPC_TIPOS[$tipo])) {
-            $advertencias[] = "Fila $fila ($nombre $apellido): tipo de banca inválido «" . trim((string)($row[4] ?? '')) . "», se omitió.";
+            $advertencias[] = "Fila $fila ($nombre $apellido): tipo de banca inválido «" . trim((string)($row[5] ?? '')) . "», se omitió.";
             continue;
         }
 
         $participantes[] = [
-            'nombre'   => $nombre,
-            'apellido' => $apellido,
-            'dni'      => $dni,
-            'genero'   => $genero,
-            'tipo'     => $tipo,
+            'nombre'    => $nombre,
+            'apellido'  => $apellido,
+            'dni'       => $dni,
+            'genero'    => $genero,
+            'prioridad' => $prioridad,
+            'tipo'      => $tipo,
         ];
     }
 
@@ -105,11 +121,18 @@ function ppc_estadisticas(array $participantes): array
 {
     $porTipo = [2 => 0, 3 => 0, 4 => 0];
     $porGenero = ['M' => 0, 'V' => 0, 'O' => 0];
+    $porPrioridad = array_fill_keys(PPC_PRIORIDADES, 0);
     foreach ($participantes as $p) {
         $porTipo[$p['tipo']]++;
         $porGenero[$p['genero']]++;
+        $porPrioridad[$p['prioridad']]++;
     }
-    return ['total' => count($participantes), 'por_tipo' => $porTipo, 'por_genero' => $porGenero];
+    return [
+        'total'         => count($participantes),
+        'por_tipo'      => $porTipo,
+        'por_genero'    => $porGenero,
+        'por_prioridad' => $porPrioridad,
+    ];
 }
 
 /** Clase de género para los cupos: O ocupa el cupo de varones. */
@@ -127,6 +150,27 @@ function ppc_shuffle(array $items): array
         [$items[$i], $items[$j]] = [$items[$j], $items[$i]];
     }
     return $items;
+}
+
+/**
+ * Orden general de prelación: sortea cada bloque de prioridad por separado y
+ * los concatena de mayor a menor prioridad, de modo que toda la prioridad 1
+ * precede a toda la prioridad 2.
+ */
+function ppc_orden_prelacion(array $participantes): array
+{
+    $bloques = array_fill_keys(PPC_PRIORIDADES, []);
+    foreach ($participantes as $p) {
+        $bloques[$p['prioridad']][] = $p;
+    }
+
+    $orden = [];
+    foreach ($bloques as $bloque) {
+        foreach (ppc_shuffle($bloque) as $p) {
+            $orden[] = $p;
+        }
+    }
+    return $orden;
 }
 
 /**
@@ -184,8 +228,8 @@ function ppc_sortear(array $participantes): array
         );
     }
 
-    // 1. Orden general de prelación.
-    $orden = ppc_shuffle($participantes);
+    // 1. Orden general de prelación, con la prioridad 1 antes que la 2.
+    $orden = ppc_orden_prelacion($participantes);
     foreach ($orden as $i => &$p) {
         $p['orden'] = $i + 1;
     }

@@ -449,8 +449,9 @@ function nombre_completo(array $p): string
             </div>
             <p class="metodo">
                 <i class="fas fa-check-circle"></i>
-                Sorteo realizado mediante orden general de prelación aleatorio, con cupos por tipo de banca
-                y equilibrio de género entre mujeres y varones en titulares y cotitulares.
+                Sorteo realizado mediante orden general de prelación aleatorio, sorteado primero entre quienes
+                no participaron antes (prioridad 1) y después entre quienes ya participaron (prioridad 2),
+                con cupos por tipo de banca y equilibrio de género entre mujeres y varones en titulares y cotitulares.
             </p>
         </div>
 
@@ -567,7 +568,8 @@ function nombre_completo(array $p): string
 
             <p style="margin-top: 1rem; font-size: 0.8125rem; color: var(--text-secondary);">
                 Las suplencias cubren eventuales renuncias, vacancias o imposibilidades de participación,
-                respetando el orden general de prelación resultante del sorteo.
+                respetando el orden general de prelación resultante del sorteo, que ubica primero a
+                quienes no participaron antes.
             </p>
         </div>
 
